@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}registro{% endblock %}
+
+
+{% block body %}
+	<style>
+		.badge {
+			display: inline-block;
+			padding: 0.35em 0.65em;
+			font-size: 0.55em;
+			font-weight: 700;
+			line-height: 1;
+			color: #fff;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: baseline;
+			border-radius: 0.25rem;
+		}
+
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+
+		.divider:after,
+		.divider:before {
+			content: "";
+			flex: 1;
+			height: 1px;
+			background: #eee;
+		}
+
+		.h-custom {
+			height: calc(100% - 73px);
+		}
+
+		@media(max-width: 450px) {
+			.h-custom {
+				height: 100%;
+			}
+		}
+	</style>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">
+				<img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="15" alt="MDB Logo" loading="lazy">
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/register">Register</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/login">Login</a>
+					</li>
+				</ul>
+				<div class="d-flex align-items-center">
+					<a class="text-reset me-3" href="#">
+						<i class="fas fa-shopping-cart"></i>
+						<span class="badge rounded-pill bg-danger position-absolute">1</span>
+					</a>
+					<div class="dropdown">
+						<a class="text-reset me-3 mx-1 dropdown-toggle dropdown-toggle-icon" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fas fa-bell"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+							<li>
+								<a class="dropdown-item" href="#">Some news</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#">Another news</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#">Something else here</a>
+							</li>
+						</ul>
+					</div>
+					<div class="dropdown">
+						<a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy">
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+							<li>
+								<a class="dropdown-item" href="#">My profile</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#">Settings</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#">Logout</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="tab-content ">
+		<div class="h-100 px-5 py-4 d-flex align-items-center justify-content-center">
+			<div class="card  px-5 py-42 bg-light rounded shadow-lg">
+				<div class="card-body">
+					<form @submit.prevent="submitFormCustomer">
+						<div class="text-center mb-3">
+							<p>Sign up with:</p>
+							<button type="button" class="btn btn-primary btn-floating mx-1">
+								<i class="fab fa-facebook-f"></i>
+							</button>
+
+							<button type="button" class="btn btn-danger btn-floating mx-1">
+								<i class="fab fa-google"></i>
+							</button>
+
+							<button type="button" class="btn btn-info btn-floating mx-1">
+								<i class="fab fa-twitter"></i>
+							</button>
+
+							<button type="button" class="btn btn-dark btn-floating mx-1">
+								<i class="fab fa-github"></i>
+							</button>
+						</div>
+
+						<p class="text-center">or:</p>
+
+						<!-- Name input -->
+						<div class="form-floating mb-4">
+							<input type="text" v-model="customer.fullName"  id="registerName" class="form-control"/>
+							<label class="form-label" for="registerName">Full Name</label>
+						</div>
+
+						<!-- Email input -->
+						<div class="form-floating mb-4">
+							<input type="email" v-model="customer.email" id="registerEmail" class="form-control"/>
+							<label class="form-label"   for="registerEmail">Email</label>
+						</div>
+
+						<!-- Password input -->
+						<div class="form-floating mb-5">
+							<input type="password"  v-model="customer.password" id="registerPassword" class="form-control"/>
+							<label class="form-label" for="registerPassword">Password</label>
+						</div>
+
+						<!-- Checkbox -->
+
+						<!-- Submit button -->
+						<div class="text-center">
+							<button type="submit"  :disabled="!customer.fullName || !customer.email || !customer.password"  class="btn btn-primary btn-block w-50 my-2">Sign up</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+

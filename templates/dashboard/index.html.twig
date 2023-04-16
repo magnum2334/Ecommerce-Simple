@@ -1,0 +1,254 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}dashboard
+{% endblock %}
+
+
+{% block body %}
+	<style></style>
+	<!--Main Navigation-->
+	<header>
+		<!-- Sidebar -->
+		<div class="container-fluid">
+			<div class="row flex-nowrap">
+				<div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+					<div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+						<a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+							<span class="fs-5 d-none d-sm-inline">Menu</span>
+						</a>
+						<div class="btn-group-vertical w-100" role="group" aria-label="Menu">
+							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Productos')">
+								<i class="bi bi-house-fill me-2"></i>
+								<span class="d-none d-sm-inline">Productos</span>
+							</button>
+							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Usuarios')">
+								<i class="bi bi-people-fill me-2"></i>
+								<span class="d-none d-sm-inline">Clientes</span>
+							</button>
+							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Ordenes')">
+								<i class="bi bi-people-fill me-2"></i>
+								<span class="d-none d-sm-inline">Ordenes</span>
+							</button>
+							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Inactivos')">
+								<i class="bi bi-people-fill me-2"></i>
+								<span class="d-none d-sm-inline">Inventario</span>
+							</button>
+						</div>
+						<hr>
+						<div class="dropdown pb-4">
+							<button class=" btn btn-sm bg-dark dropdown-toggle" type="button" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+								<img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle me-2">
+								<span class="d-none d-sm-inline-block">loser</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+								<li>
+									<a class="dropdown-item" href="#">Configuraciones</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href="#">Perfil</a>
+								</li>
+								<li><hr class="dropdown-divider"></li>
+								<li>
+									<a class="dropdown-item" href="#">Cerrar</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="col py-3">
+					<div class="text-center">
+						<h2 class="mb-0 text-center">Dashboard Ecommerce
+							<i class="fas fa-tachometer-alt"></i>
+						</h2><br>
+					</div>
+					<div v-if="showProduct">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Productos
+								<i class="fas fa-shopping-cart mr-2"></i>
+							</h5><br>
+							<div class="d-flex justify-content-between align-items-center mb-4">
+								<button type="button" class="btn btn-success btn-lg py-1 border-none px-4" data-bs-toggle="modal" data-bs-target="#modalCreateProduct">
+									<i class="fas fa-plus me-2"></i>Añadir producto
+								</button>
+								<button type="button" class="btn btn-success btn-lg py-1 px-4" data-bs-toggle="modal" data-bs-target="#modalCreateCategory">
+									<i class="fas fa-plus me-2"></i>Añadir categoría
+								</button>
+							</div>
+							<div class="modal fade" id="modalCreateProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+									<div class="modal-content">
+										<div class="modal-header bg-primary text-light">
+											<h5 class="modal-title" id="exampleModalLabel">Agregar Producto</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body">
+											<b-form @submit.prevent="submitFormProduct">
+												<b-row>
+													<b-col sm="12" md="6">
+														<b-form-group id="title-input-group" label="Título" label-for="title-input">
+															<b-form-input id="title-input" v-model="product.title" type="text" placeholder="Ingrese el título del producto" size="lg"/>
+														</b-form-group>
+													</b-col>
+													<b-col sm="12" md="6">
+														<b-form-group id="description-input-group" label="Descripción" label-for="description-input">
+															<b-form-input id="description-input" v-model="product.description" type="text" placeholder="Ingrese la descripción del producto" size="lg"/>
+														</b-form-group>
+													</b-col>
+												</b-row>
+												<b-row>
+													<b-col sm="12" md="6">
+														<b-form-group id="code-input-group" label="Código" label-for="code-input">
+															<b-form-input id="code-input" v-model="product.code" type="text" placeholder="Ingrese el código del producto" size="lg"/>
+														</b-form-group>
+													</b-col>
+													<b-col sm="12" md="6">
+														<b-form-group id="price-input-group" label="Precio" label-for="price-input">
+															<b-form-input id="price-input" v-model="product.price" type="number" step="0.01" placeholder="Ingrese el precio del producto" size="lg"/>
+														</b-form-group>
+													</b-col>
+												</b-row>
+												<b-row>
+													<b-col sm="12" md="6">
+														<b-form-group id="stock-input-group" label="Stock" label-for="stock-input">
+															<b-form-input id="stock-input" v-model="product.stock" type="number" placeholder="Ingrese el stock del producto" size="lg"/>
+														</b-form-group>
+													</b-col>
+													<b-col sm="12" md="6">
+														<b-form-group clas id="category-input-group" label="Categoría" label-for="category-input">
+															<b-form-select class="form-select" id="category-input" v-model="product.category" :options="product.categories" value="id" class="form-select-lg" @change="console.log(product.category)"/>
+														</b-form-group>
+													</b-col>
+												</b-row>
+												<div class="d-flex justify-content-center mt-4">
+													<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!product.title || !product.description || !product.code || !product.price || !product.stock">Guardar</b-button>
+													<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
+												</div>
+											</b-form>
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<div class="modal fade" id="modalCreateCategory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+									<div class="modal-content">
+										<div class="modal-header bg-primary text-light">
+											<h5 class="modal-title" id="exampleModalLabel">Agregar Categoria</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body">
+											<b-form @submit.prevent="submitFormCategory">
+												<b-form-group id="name-input-group" label="Nombre" label-for="name-input">
+													<b-form-input id="name-input" v-model="category.name" type="text" placeholder="Ingrese el nombre de la categoría" size="lg"/>
+												</b-form-group>
+												<div class="d-flex justify-content-center mt-4">
+													<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!category.name">Guardar</b-button>
+													<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
+												</div>
+											</b-form>
+										</div>
+
+									</div>
+								</div>
+							</div>
+
+
+						</div>
+						<div class="row">
+							<div class="col-12 col-md-4">
+								<div class=" form-control py-2">
+									<label class="from-label">
+										<strong>Filter to Tilte</strong>
+									</label>
+									<input placeholder="filter..." class="form-control" v-model="titleFilter">
+								</div>
+							</div>
+							<div class="col-12 col-md-4">
+								<div class="form-control py-2">
+									<label>
+										<strong>Filter to Category</strong>
+									</label>
+									<input placeholder="filter..." class="form-control" v-model="categoryFilter">
+								</div>
+							</div>
+							<div class="col-12 col-md-4">
+								<div class="form-control py-2">
+									<label class="from-label">
+										<strong>Filter to Code</strong>
+									</label>
+									<input placeholder="filter..." class="form-control" v-model="codeFilter">
+								</div>
+							</div>
+						</div>
+						<b-table striped hover :items="filteredProducts" :fields="product.fields">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+						</b-table>
+					</div>
+					<div v-if="showUsers">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Clientes
+								<i class="fas fa-users mr-2"></i>
+							</h5><br>
+
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Fullname</strong>
+								</label>
+								<input placeholder="filter..." class="form-control" v-model="nameFilter">
+							</div>
+						</div>
+						<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields"></b-table>
+					</div>
+					<div v-if="showOrdenes">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Ordenes
+								<i class="fas fa-users mr-2"></i>
+							</h5><br>
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Orden</strong>
+								</label>
+								<input placeholder="filter..." class="form-control" v-model="ordenesFilter">
+							</div>
+						</div>
+						<b-table striped hover :filter="ordenesFilter" :items="order.orders">
+							<template #cell(products)="row">
+								<ul>
+									<li v-for="product in row.item.products">
+										<strong>Nombre:</strong>${product.productName},
+										<br>
+										<strong>Cantidad</strong>:${product.quantity}
+										<br>
+										<strong>Precio</strong>:${product.price}
+									</li>
+								</ul>
+							</template>
+						</b-table>
+					</div>
+					<div v-if="showInactivos">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Inventario<i class="fas fa-shopping-cart mr-2"></i>
+							</h5><br>
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Product</strong>
+								</label>
+								<input class="form-control" v-model="inactiveFitler">
+							</div>
+						</div>
+						<b-table striped hover :items="product.inactiveProducts" :filter="inactiveFitler" :fields="product.fields">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+						</b-table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Navbar -->
+	</header>
+
+{% endblock %}
