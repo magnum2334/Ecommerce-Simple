@@ -19,7 +19,7 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item">
-							<a class="nav-link" href="#">Home</a>
+							<a class="nav-link" href="/">Home</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/register">Register</a>
@@ -29,9 +29,8 @@
 						</li>
 					</ul>
 					<div class="d-flex align-items-center">
-						<a class="text-reset me-3" href="#">
+						<a class="text-reset me-3" @click="cardFuction('cart')" >
 							<i class="fas fa-shopping-cart"></i>
-							<span class="badge rounded-pill bg-danger position-absolute">1</span>
 						</a>
 						<div class="dropdown">
 							<a class="text-reset me-3 mx-1 dropdown-toggle dropdown-toggle-icon" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -73,7 +72,7 @@
 		<div
 			class="container">
 			<!--Section: Content-->
-			<section class="text-center">
+			<section v-if="!cardSelect" class="text-center">
 				<h4 class="mb-5">
 					<strong>Latest posts</strong>
 				</h4>
@@ -93,33 +92,44 @@
 								<h5 class="card-title">${product.name}</h5>
 								<p class="card-text">${product.description}</p>
 								<p class="card-text">
-									<b>Category: ${product.category.name}</b>
+									<b>${product.category.name}</b>
 								</p>
 							</b-card-body>
 							<b-card-footer>
 								<span class="text-muted">${product.price}</span>
-								<b-button variant="primary" size="sm" class="float-end">Add to cart</b-button>
+								<b-button variant="primary" size="sm" class="float-end" @click="addToCart(product)" >Add to cart</b-button>
 								<span class="text-muted float-end me-3">In stock: ${product.stock}</span>
 							</b-card-footer>
 						</b-card>
 					</div>
 				</div>
-			</div>
-		{% endblock %}
-
-		{% block javascripts %}
-
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.14/vue.min.js" integrity="sha512-BAMfk70VjqBkBIyo9UTRLl3TBJ3M0c6uyy2VMUrq370bWs7kchLNN9j1WiJQus9JAJVqcriIUX859JOm12LWtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-vue/2.23.1/bootstrap-vue.min.js" integrity="sha512-SP/zE7YazvnUG95bWnA1AeC5+WtAOqumEHSgcKTNfVefAMsDcVCt6D3Q3goqR3vSf50zPG3OZtnMjBJd9GBgkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-			<script defer src="{{ asset('main.js') }}"></script>
-			<link rel="stylesheet" href="{{ asset('styless.css')}}">
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js" integrity="sha512-LUKzDoJKOLqnxGWWIBM4lzRBlxcva2ZTztO8bTcWPmDSpkErWx0bSP4pdsjNH8kiHAUPaT06UXcb+vOEZH+HpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-			<link rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css" integrity="sha384-..." crossorigin="anonymous">
-			<link defer href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
-			<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-			<link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/726/726570.png">
-			<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
-			<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
-
+			</section>
+			<section v-if="cardSelect">
+				<div class="container-fluid">
+					<div class="row"> 
+						<div class="text-center">
+							<div class="mb-0 text-center">
+								<h5 class="mb-0 "><strong>My Cart</strong>
+								</h5><br>
+								<button class="btn btn-success my-2"  @click="payload(cart)">
+									comprar
+									<i class="fas fa-shopping-cart mr-2"></i>
+								</button>
+							</div>
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Product</strong>
+								</label>
+								<input class="form-control" v-model="cartFilter">
+							</div>
+						</div>
+						<b-table striped hover :items="cart" :filter="cartFilter" :fields="product.fields">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+						</b-table>
+					</div>  
+				</div>  
+			</section>
+		</div>
 		{% endblock %}

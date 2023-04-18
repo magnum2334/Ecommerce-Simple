@@ -32,12 +32,12 @@ class DashboardController extends AbstractController
 
         return $this->json($categories);
     }
-
     #[Route('/products', name: 'app_products', methods: ['GET'])]
     public function getProducts(ManagerRegistry $doctrine): JsonResponse
     {
         $entityManager = $doctrine->getManager();
-        $products = $entityManager->getRepository(Products::class)->findAll();
+        $products = $entityManager->getRepository(Products::class)
+                    ->findBy([], ['id' => 'ASC']);
 
         return $this->json($products);
     }

@@ -13,6 +13,11 @@ let app = new Vue({
         emailFilter: '',
         inactiveFitler: '',
         ordenesFilter: '',
+        cart: [],
+        customerOrders: '',
+        userVerified: false,
+        cartFilter: '',
+        cardSelect: false,
         category: {
             name: ''
         },
@@ -35,85 +40,30 @@ let app = new Vue({
             fields: ['fullname', 'email', 'status'],
             customers: [],
             fullName: '',
-            email: '' ,
+            email: '',
             password: '',
+            registerCheck: '',
+            emailLogin: '',
+            passwordLogin: '',
             registerCheck: ''
 
         },
         order: {
             orders: [
-
             ]
-
         }
+
     }),
+
     async created() {
+        this.categories()
+        this.products()
+        this.customers()
+        this.orders()
+        if (this.userVerified) {
+            this.ordersUser()
+        }
 
-        const customer = await axios.get('http://localhost:8000/customers')
-        this.customer.customers = customer.data
-
-
-        const categories = await axios.get('http://localhost:8000/categories');
-        this.product.categories = [
-            { value: null, text: 'Seleccione una categoría', disabled: true },
-            ...categories.data.map(({ id, name }) => ({ value: id, text: name }))
-        ];
-
-        const prducts = await axios.get('http://localhost:8000/products')
-        this.product.existProducts = true
-        this.product.products = prducts.data
-            .filter(item => item.status === true)
-            .map(item => ({
-                title: item.title,
-                description: item.description,
-                code: item.code,
-                price: "$" + item.price,
-                stock: item.stock,
-                status: item.status ? "available" : "not available",
-                category: item.category,
-                actions: null
-            }))
-
-        this.product.inactiveProducts = prducts.data
-            .filter(item => item.status === false)
-            .map(item => ({
-                title: item.title,
-                description: item.description,
-                code: item.code,
-                price: item.price,
-                stock: item.stock,
-                status: item.status ? "available" : "not available",
-                category: item.category,
-                actions: null
-            }))
-        const orders = await axios.get('http://localhost:8000/orders')
-
-        const dara = Object.values(orders.data.reduce((acc, item) => {
-            if (!acc[item.orden_id]) {
-                acc[item.orden_id] = {
-                    orden_id: item.orden_id,
-                    customerName: item.fullname,
-                    customerEmail: item.email,
-                    orderDate: new Date().toISOString().split('T')[0], // Set to today's date
-                    products: [],
-                    total: 0,
-                    status: 'Pending'
-                };
-            }
-
-            acc[item.orden_id].products.push({
-                productId: item.product_id,
-                productName: item.code,
-                quantity: item.quantity,
-                price: item.unitPrice
-            });
-
-            acc[item.orden_id].total += item.unitPrice * item.quantity;
-
-            return acc;
-        }, {}));
-        console.log(dara)
-        this.order.orders = dara;
     },
     mounted() {
 
@@ -142,18 +92,24 @@ let app = new Vue({
                 this.showProduct = false
                 this.showOrdenes = false
                 this.showInactivos = false
-            }  if (typ == 'Ordenes') {
+            } if (typ == 'Ordenes') {
                 this.showOrdenes = true
                 this.showUsers = false
                 this.showProduct = false
                 this.showInactivos = false
-            } if(typ == 'Inactivos') {
+            } if (typ == 'Inactivos') {
                 this.showOrdenes = false
                 this.showUsers = false
                 this.showProduct = false
                 this.showInactivos = true
             }
-            console.log(this.showProduct)
+        },
+        cardFuction(typ) {
+            if (typ == 'cart') {
+                this.cardSelect = true
+            } else {
+                this.cardSelect = false
+            }
         },
         async submitFormProduct() {
             let data = {
@@ -175,6 +131,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.products();
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
                 Swal.fire({
@@ -184,6 +141,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.created();
             }
         },
         async submitFormCategory() {
@@ -200,6 +158,8 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.categories();
+
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
                 Swal.fire({
@@ -211,11 +171,81 @@ let app = new Vue({
                 });
             }
         },
+        async categories() {
+            const categories = await axios.get('http://localhost:8000/categories');
+            this.product.categories = [
+                { value: null, text: 'Seleccione una categoría', disabled: true },
+                ...categories.data.map(({ id, name }) => ({ value: id, text: name }))
+            ];
+        },
+        async products() {
+            const prducts = await axios.get('http://localhost:8000/products')
+            this.product.existProducts = true
+            this.product.products = prducts.data
+                .filter(item => item.status === true)
+                .map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    description: item.description,
+                    code: item.code,
+                    price: "$" + item.price,
+                    stock: item.stock,
+                    status: item.status ? "available" : "not available",
+                    category: item.category,
+                    actions: null
+                }))
+
+            this.product.inactiveProducts = prducts.data
+                .filter(item => item.status === false)
+                .map(item => ({
+                    title: item.title,
+                    description: item.description,
+                    code: item.code,
+                    price: item.price,
+                    stock: item.stock,
+                    status: item.status ? "available" : "not available",
+                    category: item.category,
+                    actions: null
+                }))
+        },
+        async customers() {
+            const customer = await axios.get('http://localhost:8000/customers')
+            this.customer.customers = customer.data
+        },
+        async orders() {
+            const orders = await axios.get('http://localhost:8000/orders')
+
+            const dara = Object.values(orders.data.reduce((acc, item) => {
+                if (!acc[item.orden_id]) {
+                    acc[item.orden_id] = {
+                        orden_id: item.orden_id,
+                        customerName: item.fullname,
+                        customerEmail: item.email,
+                        orderDate: new Date().toISOString().split('T')[0], // Set to today's date
+                        products: [],
+                        total: 0,
+                        status: 'Pending'
+                    };
+                }
+
+                acc[item.orden_id].products.push({
+                    productId: item.product_id,
+                    productName: item.code,
+                    quantity: item.quantity,
+                    price: item.unitPrice
+                });
+
+                acc[item.orden_id].total += item.unitPrice * item.quantity;
+
+                return acc;
+            }, {}));
+            this.order.orders = dara;
+        },
         async submitFormCustomer() {
             let data = {
                 fullname: this.customer.fullName,
                 email: this.customer.email,
-                password: this.customer.fullName,
+                password: this.customer.password,
             };
 
             try {
@@ -227,6 +257,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.customers()
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
                 Swal.fire({
@@ -236,6 +267,126 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+            }
+        },
+        async submitFormLogin() {
+            try {
+                let data = {
+                    email: this.customer.emailLogin,
+                    password: this.customer.passwordLogin,
+                };
+                const response = await axios.post('http://127.0.0.1:8000/dashboard/user', data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'inicio realizado con éxito',
+                    text: "Se inicia correctamente en la cuenta",
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+                if (this.customer.emailLogin == 'admin@admin.com' && this.customer.passwordLogin == 'error404') {
+                    window.location.href = 'http://127.0.0.1:8000/dashboard'
+                } else {
+                    window.location.href = 'http://127.0.0.1:8000/dashboard/user/' + response.data.user.id
+                }
+            } catch (error) {
+                let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al crear la cuenta',
+                    text: errorMessage,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        },
+        addToCart(productId) {
+            this.cart.push(productId)
+            console.log(this.cart)
+        },
+        ordersUser(email) {
+            return this.customerOrders = this.order.orders.filter((order) => order.customerEmail == email)
+        },
+        async payload(card) {
+            if (this.cart.length === 0) {
+                // Si el carrito está vacío, muestra un mensaje de error
+                await Swal.fire({
+                    title: 'El carrito está vacío',
+                    icon: 'error',
+                    text: 'Agrega algunos productos antes de realizar una compra',
+                })
+            } else {
+                try {
+                    const order = {
+                        customer_id: 1,
+                        order_date: new Date().toISOString().slice(0, 10),
+                        order_details: []
+                    };
+                    this.cart.forEach((product) => {
+                        const existingProductIndex = order.order_details.findIndex((orderProduct) => orderProduct.product_id === product.id);
+                        if (existingProductIndex !== -1) {
+                            order.order_details[existingProductIndex].quantity += 1;
+                        } else {
+                            order.order_details.push({
+                                product_id: product.id,
+                                quantity: 1
+                            });
+                        }
+                    });
+
+                    const response = await axios.post('http://localhost:8000/create/order', order);
+                    if (response.data.message === 'The order was successfully created') {
+                        // SweetAlert para orden creada con éxito
+                        Swal.fire({
+                            title: '¡Orden creada!',
+                            text: 'La orden ha sido creada exitosamente',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        });
+                        this.cart = [];
+                    }
+                } catch (error) {
+                    console.error(error);
+                    // SweetAlert para error al crear la orden
+                    try {
+                        const order = {
+                            customer_id: 1,
+                            order_date: new Date().toISOString().slice(0, 10),
+                            order_details: []
+                        };
+                        this.cart.forEach((product) => {
+                            const existingProductIndex = order.order_details.findIndex((orderProduct) => orderProduct.product_id === product.id);
+                            if (existingProductIndex !== -1) {
+                                order.order_details[existingProductIndex].quantity += 1;
+                            } else {
+                                order.order_details.push({
+                                    product_id: product.id,
+                                    quantity: 1
+                                });
+                            }
+                        });
+
+                        const response = await axios.post('http://localhost:8000/create/order', order);
+                        if (response.data.message === 'The order was successfully created' ) {
+                            // SweetAlert para orden creada con éxito
+                            Swal.fire({
+                                title: '¡Orden creada!',
+                                text: 'La orden ha sido creada exitosamente',
+                                icon: 'success',
+                                confirmButtonText: 'Ok'
+                            });
+                            this.cart = [];
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        // SweetAlert para error al crear la orden
+                        Swal.fire({
+                            title: '¡Error!',
+                            text: 'Ha ocurrido un error al crear la orden: '+ error.response.data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                }
             }
         }
     },

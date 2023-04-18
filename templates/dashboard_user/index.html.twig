@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}dashboard
+{% endblock %}
+
+{% block body %}
+	<style></style>
+	<!--Main Navigation-->
+	<header>
+		<!-- Sidebar -->
+		<div class="container-fluid">
+			<div class="row flex-nowrap">
+				<div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary">
+					<div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+						<a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+							<span class="fs-5 d-none d-sm-inline">Menu</span>
+						</a>
+						<div class="btn-group-vertical w-100" role="group" aria-label="Menu">
+							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Ordenes')">
+								<i class="bi bi-people-fill me-2"></i>
+								<span class="d-none d-sm-inline">Ordenes</span>
+							</button>
+						</div>
+						<hr>
+						<div class="dropdown pb-4">
+							<button class=" btn btn-sm bg-dark dropdown-toggle" type="button" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+								<img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle me-2">
+								<br><span class="d-none text-white d-sm-inline-block">{{user}}</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+								<li>
+									<a class="dropdown-item" href="#">Configuraciones</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href="#">Perfil</a>
+								</li>
+								<li><hr class="dropdown-divider"></li>
+								<li>
+									<a class="dropdown-item" href="#">Cerrar</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="col py-3">
+					<div class="text-center">
+						<h2 class="mb-0 text-center">Dashboard User
+							<i class="fas fa-tachometer-alt"></i>
+						</h2><br>
+					</div>
+					<div>
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Mis Ordenes
+								<i class="fas fa-shopping-cart mr-2"></i>
+							</h5><br>
+						</div>
+						<div class="row">
+						</div>
+						<b-table striped hover :items="customerOrders" :fields="product.fields">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+						</b-table>
+					</div>
+					<div v-if="showUsers">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Clientes
+								<i class="fas fa-users mr-2"></i>
+							</h5><br>
+
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Fullname</strong>
+								</label>
+								<input placeholder="filter..." class="form-control" v-model="nameFilter">
+							</div>
+						</div>
+						<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields"></b-table>
+					</div>
+					<div v-if="showOrdenes">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Ordenes
+								<i class="fas fa-users mr-2"></i>
+							</h5><br>
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Orden</strong>
+								</label>
+								<input placeholder="filter..." class="form-control" v-model="ordenesFilter">
+							</div>
+						</div>
+						<b-table striped hover :filter="ordenesFilter" :items="order.orders">
+							<template #cell(products)="row">
+								<ul>
+									<li v-for="product in row.item.products">
+										<strong>Nombre:</strong>${product.productName},
+										<br>
+										<strong>Cantidad</strong>:${product.quantity}
+										<br>
+										<strong>Precio</strong>:${product.price}
+									</li>
+								</ul>
+							</template>
+						</b-table>
+					</div>
+					<div v-if="showInactivos">
+						<div class="text-center">
+							<h5 class="mb-0 text-center">Inventario<i class="fas fa-shopping-cart mr-2"></i>
+							</h5><br>
+							<div class="form-control py-2">
+								<label>
+									<strong>Filter to Product</strong>
+								</label>
+								<input class="form-control" v-model="inactiveFitler">
+							</div>
+						</div>
+						<b-table striped hover :items="product.inactiveProducts" :filter="inactiveFitler" :fields="product.fields">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+						</b-table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Navbar -->
+	</header>
+
+{% endblock %}

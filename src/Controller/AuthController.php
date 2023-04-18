@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Customer;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 
 class AuthController extends AbstractController
 {
@@ -31,28 +31,6 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/auth', name: 'app_auth', methods: ['POST'])]
-    public function auth(Request $request, ManagerRegistry $doctrine): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-    
-        $entityManager = $doctrine->getManager();
-        $userRepository = $entityManager->getRepository(Customer::class);
-        $user = $userRepository->findOneBy(['email' => $data['email' ]]);
-    
-        if (!$user || !password_verify($data['password' ], $user->getPassword())) {
-            throw new BadRequestHttpException('Invalid email or password');
-        }
-    
-        $token = bin2hex(random_bytes(32));
-        $user->setApiToken($token);
-        $entityManager->flush();
-    
-        return $this->json([
-            'message' => 'Welcome!',
-            'token' => $token
-        ]);
-    }
     
     
     #[Route('/create/customer', name: 'app_create_customer', methods: ['POST'])]
