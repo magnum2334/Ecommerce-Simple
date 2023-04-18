@@ -18,6 +18,8 @@ let app = new Vue({
         userVerified: false,
         cartFilter: '',
         cardSelect: false,
+        isLoggin: false,
+        linkCustomer: '',
         category: {
             name: ''
         },
@@ -45,8 +47,8 @@ let app = new Vue({
             registerCheck: '',
             emailLogin: '',
             passwordLogin: '',
-            registerCheck: ''
-
+            registerCheck: '',
+            customer_id: 0
         },
         order: {
             orders: [
@@ -63,10 +65,15 @@ let app = new Vue({
         if (this.userVerified) {
             this.ordersUser()
         }
-
+       
     },
     mounted() {
-
+       
+        if (localStorage.getItem('customer') !== null) {
+            this.customer.customer_id = JSON.parse(localStorage.getItem('customer'))
+            this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' +  this.customer.customer_id
+            this.isLoggin = true
+        }
     },
     computed: {
         filteredProducts() {
@@ -286,7 +293,10 @@ let app = new Vue({
                 if (this.customer.emailLogin == 'admin@admin.com' && this.customer.passwordLogin == 'error404') {
                     window.location.href = 'http://127.0.0.1:8000/dashboard'
                 } else {
-                    window.location.href = 'http://127.0.0.1:8000/dashboard/user/' + response.data.user.id
+                    this.isLoggin = true
+                    this.customer.customer_id = response.data.user.id
+                    this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' + response.data.user.id
+                    localStorage.setItem('customer', response.data.user.id)
                 }
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
@@ -301,23 +311,29 @@ let app = new Vue({
         },
         addToCart(productId) {
             this.cart.push(productId)
-            console.log(this.cart)
+            localStorage.setItem('cart', JSON.stringify(this.cart))
         },
+        
         ordersUser(email) {
             return this.customerOrders = this.order.orders.filter((order) => order.customerEmail == email)
         },
         async payload(card) {
             if (this.cart.length === 0) {
-                // Si el carrito está vacío, muestra un mensaje de error
                 await Swal.fire({
                     title: 'El carrito está vacío',
                     icon: 'error',
                     text: 'Agrega algunos productos antes de realizar una compra',
-                })
+                });
+            } else if (this.customer.customer_id === 0) {
+                await Swal.fire({
+                    title: 'No se ha iniciado sesión',
+                    icon: 'warning',
+                    text: 'Por favor, inicia sesión para crear una orden',
+                });
             } else {
                 try {
                     const order = {
-                        customer_id: 1,
+                        customer_id: this.customer.customer_id = JSON.parse(localStorage.getItem('customer')),
                         order_date: new Date().toISOString().slice(0, 10),
                         order_details: []
                     };
@@ -346,48 +362,15 @@ let app = new Vue({
                     }
                 } catch (error) {
                     console.error(error);
-                    // SweetAlert para error al crear la orden
-                    try {
-                        const order = {
-                            customer_id: 1,
-                            order_date: new Date().toISOString().slice(0, 10),
-                            order_details: []
-                        };
-                        this.cart.forEach((product) => {
-                            const existingProductIndex = order.order_details.findIndex((orderProduct) => orderProduct.product_id === product.id);
-                            if (existingProductIndex !== -1) {
-                                order.order_details[existingProductIndex].quantity += 1;
-                            } else {
-                                order.order_details.push({
-                                    product_id: product.id,
-                                    quantity: 1
-                                });
-                            }
-                        });
-
-                        const response = await axios.post('http://localhost:8000/create/order', order);
-                        if (response.data.message === 'The order was successfully created' ) {
-                            // SweetAlert para orden creada con éxito
-                            Swal.fire({
-                                title: '¡Orden creada!',
-                                text: 'La orden ha sido creada exitosamente',
-                                icon: 'success',
-                                confirmButtonText: 'Ok'
-                            });
-                            this.cart = [];
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        // SweetAlert para error al crear la orden
-                        Swal.fire({
-                            title: '¡Error!',
-                            text: 'Ha ocurrido un error al crear la orden: '+ error.response.data.message,
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        });
-                    }
+                    Swal.fire({
+                        title: '¡Error!',
+                        text: 'Ha ocurrido un error al crear la orden: ' + error.response.data.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
                 }
             }
+
         }
     },
 })

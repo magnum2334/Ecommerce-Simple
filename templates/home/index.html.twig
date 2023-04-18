@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}hello!{% endblock %}
+{% block title %}hello!
+{% endblock %}
 
 
 {% block body %}
@@ -10,8 +11,8 @@
 		<!-- Navbar -->
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container-fluid">
-				<a class="navbar-brand" href="#">
-					<img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="15" alt="MDB Logo" loading="lazy">
+				<a class="navbar-brand text-primary" href="#">
+					Home Elements
 				</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
@@ -29,35 +30,16 @@
 						</li>
 					</ul>
 					<div class="d-flex align-items-center">
-						<a class="text-reset me-3" @click="cardFuction('cart')" >
+						<a class="text-reset me-3" @click="cardFuction('cart')">
 							<i class="fas fa-shopping-cart"></i>
 						</a>
-						<div class="dropdown">
-							<a class="text-reset me-3 mx-1 dropdown-toggle dropdown-toggle-icon" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								<i class="fas fa-bell"></i>
-							</a>
-							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-								<li>
-									<a class="dropdown-item" href="#">Some news</a>
-								</li>
-								<li>
-									<a class="dropdown-item" href="#">Another news</a>
-								</li>
-								<li>
-									<a class="dropdown-item" href="#">Something else here</a>
-								</li>
-							</ul>
-						</div>
-						<div class="dropdown">
+						<div v-if="isLoggin" class="dropdown">
 							<a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								<img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy">
 							</a>
 							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
 								<li>
-									<a class="dropdown-item" href="#">My profile</a>
-								</li>
-								<li>
-									<a class="dropdown-item" href="#">Settings</a>
+									<a class="dropdown-item" :href="linkCustomer">Mis ordenes</a>
 								</li>
 								<li>
 									<a class="dropdown-item" href="#">Logout</a>
@@ -74,7 +56,7 @@
 			<!--Section: Content-->
 			<section v-if="!cardSelect" class="text-center">
 				<h4 class="mb-5">
-					<strong>Latest posts</strong>
+					<strong>Productos</strong>
 				</h4>
 				<div v-if="!product.existProducts" class="row">
 					<div v-for="n in 12" :key="n" class="col-lg-4 col-md-12 mb-4">
@@ -97,7 +79,7 @@
 							</b-card-body>
 							<b-card-footer>
 								<span class="text-muted">${product.price}</span>
-								<b-button variant="primary" size="sm" class="float-end" @click="addToCart(product)" >Add to cart</b-button>
+								<b-button variant="primary" size="sm" class="float-end" @click="addToCart(product)">Add to cart</b-button>
 								<span class="text-muted float-end me-3">In stock: ${product.stock}</span>
 							</b-card-footer>
 						</b-card>
@@ -106,12 +88,13 @@
 			</section>
 			<section v-if="cardSelect">
 				<div class="container-fluid">
-					<div class="row"> 
+					<div class="row">
 						<div class="text-center">
 							<div class="mb-0 text-center">
-								<h5 class="mb-0 "><strong>My Cart</strong>
+								<h5 class="mb-0 ">
+									<strong>My Cart</strong>
 								</h5><br>
-								<button class="btn btn-success my-2"  @click="payload(cart)">
+								<button class="btn btn-success my-2" @click="payload(cart)">
 									comprar
 									<i class="fas fa-shopping-cart mr-2"></i>
 								</button>
@@ -128,8 +111,8 @@
 								${row.item.category.name}
 							</template>
 						</b-table>
-					</div>  
-				</div>  
+					</div>
+				</div>
 			</section>
 		</div>
-		{% endblock %}
+	{% endblock %}
