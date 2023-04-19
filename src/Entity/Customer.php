@@ -26,6 +26,9 @@ class Customer
     private ?bool $status = null;
 
     private $apiToken;
+
+    #[ORM\Column]
+    private ?int $rol = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -93,6 +96,18 @@ class Customer
     public function setApiToken(?string $apiToken): self
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function getRol(): ?int
+    {
+        return $this->rol;
+    }
+
+    public function setRol(int $rol): self
+    {
+        $this->rol = $rol;
 
         return $this;
     }

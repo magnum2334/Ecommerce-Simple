@@ -37,12 +37,23 @@ class AuthController extends AbstractController
     public function createCustomer(Request $request, ManagerRegistry $doctrine): Response
     {
         $data = json_decode($request->getContent(), true);
+
+        
         $customer = new Customer();
         $customer->setFullname($data['fullname']);
         $customer->setEmail($data['email']);
+
+        $entityManager = $doctrine->getManager();
+        $existingCustomer = $entityManager->getRepository(Customer::class)->findOneBy(['email' => $data['email']]);
+        if ($existingCustomer !== null) {
+            return new JsonResponse([
+                'message' => 'Ya existe un cliente registrado con este correo electrónico',
+            ], Response::HTTP_CONFLICT);
+        }
         /* encript password */
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         $customer->setPassword($hashedPassword);
+        $customer->setRol(1);
         $customer->setStatus(true);
 
         $entityManager = $doctrine->getManager();

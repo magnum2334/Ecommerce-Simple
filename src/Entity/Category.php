@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Faker\Factory;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -33,10 +34,10 @@ class Category
 
         return $this;
     }
-    public function isPasswordValid(string $password): bool
+    public function generateFakeData()
     {
-        return password_verify($password, $this->password);
+        $faker = Factory::create();
+        $this->setName($faker->word);
     }
-
     
 }

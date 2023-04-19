@@ -64,12 +64,12 @@ class ProductsController extends AbstractController
         // Validate price and stock
         if (!is_numeric($data['price']) || $data['price'] < 0) {
             return $this->json([
-                'error' => 'Invalid price value',
+                'error' => 'Valor invalido para precio del producto',
             ], Response::HTTP_BAD_REQUEST);
         }
         if (!is_numeric($data['stock']) || $data['stock'] < 0) {
             return $this->json([
-                'error' => 'Invalid stock value',
+                'error' => 'valor invalido para la cantidad del producto',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -78,7 +78,7 @@ class ProductsController extends AbstractController
             $category = $entityManager->getRepository(Category::class)->find($data['category_id']);
             if (!$category) {
                 return $this->json([
-                    'error' => 'Category "%s" does not exist',
+                    'error' => 'Categoria "%s" no existe',
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
@@ -98,7 +98,7 @@ class ProductsController extends AbstractController
         $entityManager->flush();
 
         return $this->json([
-            'message' => 'El product was successfully created',
+            'message' => 'El producto se creo!! ',
             'code' => $data['code']
         ], Response::HTTP_CREATED);
     }

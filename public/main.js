@@ -2,10 +2,12 @@ let app = new Vue({
     el: '#app',
     delimiters: ['${', '}'],
     data: () => ({
+        //show componets
         showProduct: true,
         showUsers: false,
         showOrdenes: false,
         showInactivos: false,
+        //filters
         titleFilter: '',
         categoryFilter: '',
         codeFilter: '',
@@ -13,13 +15,17 @@ let app = new Vue({
         emailFilter: '',
         inactiveFitler: '',
         ordenesFilter: '',
+        //cart
         cart: [],
-        customerOrders: '',
-        userVerified: false,
         cartFilter: '',
         cardSelect: false,
+        // orders for customers
+        customerOrders: '',
+        searchProduct: '',
         isLoggin: false,
         linkCustomer: '',
+        searchInputProduct: '',
+        changesSearch: false,
         category: {
             name: ''
         },
@@ -32,10 +38,14 @@ let app = new Vue({
             status: null,
             category: null,
             fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status'],
+            fieldsOrder: ['title', 'description', 'price', 'category'],
             products: [],
+            perPage: 5,
+            currentPage: 1,
             inactiveProducts: [],
             categories: [],
-            existProducts: false
+            existProducts: false,
+            copy: [],
 
         },
         customer: {
@@ -48,11 +58,15 @@ let app = new Vue({
             emailLogin: '',
             passwordLogin: '',
             registerCheck: '',
-            customer_id: 0
+            customer_id: 0,
+            user: '',
+            perPage: 5,
+            currentPage: 1,
         },
         order: {
-            orders: [
-            ]
+            orders: [],
+            perPage: 5,
+            currentPage: 1,
         }
 
     }),
@@ -62,16 +76,15 @@ let app = new Vue({
         this.products()
         this.customers()
         this.orders()
-        if (this.userVerified) {
-            this.ordersUser()
-        }
-       
+
     },
     mounted() {
-       
+
         if (localStorage.getItem('customer') !== null) {
             this.customer.customer_id = JSON.parse(localStorage.getItem('customer'))
-            this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' +  this.customer.customer_id
+            this.customer.user = JSON.parse(localStorage.getItem('user'))
+            console.log(this.customer.user)
+            this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' + this.customer.customer_id
             this.isLoggin = true
         }
     },
@@ -84,11 +97,19 @@ let app = new Vue({
                 return titleFilter && categoryFilter && codeFilter;
             })
         },
+        rowsTableProducts() {
+            return this.filteredProducts.length
+        },
+        rowsTablecustomer(){
+            return this.customer.customers.length
+        },
+        rowsTableOrder(){
+            return this.order.orders.length
+        }
     },
 
     methods: {
         hideText(typ) {
-            console.log(typ)
             if (typ == 'Productos') {
                 this.showProduct = true
                 this.showUsers = false
@@ -201,7 +222,7 @@ let app = new Vue({
                     category: item.category,
                     actions: null
                 }))
-
+            this.product.copy = [...this.product.products]
             this.product.inactiveProducts = prducts.data
                 .filter(item => item.status === false)
                 .map(item => ({
@@ -265,8 +286,9 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
                 this.customers()
+
             } catch (error) {
-                let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
+                let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el la cuenta. Por favor, intenta de nuevo más tarde.';
                 Swal.fire({
                     icon: 'error',
                     title: 'Error al crear la cuenta',
@@ -282,6 +304,7 @@ let app = new Vue({
                     email: this.customer.emailLogin,
                     password: this.customer.passwordLogin,
                 };
+                
                 const response = await axios.post('http://127.0.0.1:8000/dashboard/user', data);
                 Swal.fire({
                     icon: 'success',
@@ -291,12 +314,15 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
                 if (this.customer.emailLogin == 'admin@admin.com' && this.customer.passwordLogin == 'error404') {
-                    window.location.href = 'http://127.0.0.1:8000/dashboard'
+                    window.location.href = 'http://127.0.0.1:8000/dashboard/1'
                 } else {
+                    console.log( response.data.user)
                     this.isLoggin = true
                     this.customer.customer_id = response.data.user.id
                     this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' + response.data.user.id
                     localStorage.setItem('customer', response.data.user.id)
+
+                    localStorage.setItem('user', JSON.stringify(response.data.user))
                 }
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
@@ -312,10 +338,13 @@ let app = new Vue({
         addToCart(productId) {
             this.cart.push(productId)
             localStorage.setItem('cart', JSON.stringify(this.cart))
-        },
-        
-        ordersUser(email) {
-            return this.customerOrders = this.order.orders.filter((order) => order.customerEmail == email)
+            Swal.fire({
+                icon: 'success',
+                title: 'Se agrego al carrito',
+                text: "Se agrega correctamente el producto al carrito",
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar'
+            });
         },
         async payload(card) {
             if (this.cart.length === 0) {
@@ -371,6 +400,29 @@ let app = new Vue({
                 }
             }
 
+        },
+        cortarTexto(texto) {
+            if (texto.length > 64) {
+                return texto.substring(0, 61) + "...";
+            } else {
+                return texto;
+            }
+        },
+        inputChangesSearch() {
+            this.changesSearch = true
+            setTimeout(() => {
+                if (this.searchInputProduct == '') {
+                    this.product.products = this.product.copy
+                } else {
+                    const searchTerm = this.searchInputProduct.toLowerCase();
+                    this.product.products = this.product.products.filter(product => {
+                        const title = product.title.toLowerCase();
+                        const description = product.description.toLowerCase();
+                        return title.includes(searchTerm) || description.includes(searchTerm);
+                    });
+                }
+            }, 1000);
+            this.changesSearch = false
         }
     },
 })

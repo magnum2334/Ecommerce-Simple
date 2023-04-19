@@ -42,7 +42,6 @@ class DashboardUserController extends AbstractController
         $entityManager = $doctrine->getManager();
         $userRepository = $entityManager->getRepository(Customer::class);
         $user = $userRepository->findOneBy(['email' => $data['email']]);
-        
 
         if (!$user || !password_verify($data['password'], $user->getPassword())) {
             throw new BadRequestHttpException('Invalid email or password');
@@ -56,8 +55,6 @@ class DashboardUserController extends AbstractController
             'token' => $token,
             'user' => $user,
         ]);
-
-        // Redirect to the dashboard page for the authenticated user
-        return $this->redirectToRoute('app_dashboard_user', ['id' => $user->getId(), 'token' => $token,]);
+       
     }
 }

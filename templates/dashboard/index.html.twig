@@ -29,16 +29,13 @@
 								<i class="bi bi-people-fill me-2"></i>
 								<span class="d-none d-sm-inline">Ordenes</span>
 							</button>
-							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Inactivos')">
-								<i class="bi bi-people-fill me-2"></i>
-								<span class="d-none d-sm-inline">Inventario</span>
-							</button>
+							
 						</div>
 						<hr>
 						<div class="dropdown pb-4">
 							<button class=" btn btn-sm bg-dark dropdown-toggle" type="button" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
 								<img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle me-2">
-								<span class="d-none d-sm-inline-block">loser</span>
+								<span class="d-none d-sm-inline-block text-white">Administrador</span>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
 								<li>
@@ -152,8 +149,6 @@
 									</div>
 								</div>
 							</div>
-
-
 						</div>
 						<div class="row">
 							<div class="col-12 col-md-4">
@@ -181,11 +176,13 @@
 								</div>
 							</div>
 						</div>
-						<b-table striped hover :items="filteredProducts" :fields="product.fields">
+						<b-table striped hover :items="filteredProducts" :fields="product.fields" id="products" :per-page="product.perPage" :current-page="product.currentPage">
 							<template #cell(category)="row">
 								${row.item.category.name}
 							</template>
 						</b-table>
+						<p class="mt-3">Current Page: ${ product.currentPage }</p>
+						<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts" :per-page="product.perPage" aria-controls="products"></b-pagination>
 					</div>
 					<div v-if="showUsers">
 						<div class="text-center">
@@ -200,7 +197,8 @@
 								<input placeholder="filter..." class="form-control" v-model="nameFilter">
 							</div>
 						</div>
-						<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields"></b-table>
+						<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields" id="customer" :per-page="customer.perPage" :current-page="customer.currentPage"></b-table>
+						<b-pagination v-model="customer.currentPage" :total-rows="rowsTablecustomer" :per-page="customer.perPage" aria-controls="customer"></b-pagination>
 					</div>
 					<div v-if="showOrdenes">
 						<div class="text-center">
@@ -214,7 +212,7 @@
 								<input placeholder="filter..." class="form-control" v-model="ordenesFilter">
 							</div>
 						</div>
-						<b-table striped hover :filter="ordenesFilter" :items="order.orders">
+						<b-table striped hover :filter="ordenesFilter" :items="order.orders" id="order">
 							<template #cell(products)="row">
 								<ul>
 									<li v-for="product in row.item.products">
@@ -227,23 +225,9 @@
 								</ul>
 							</template>
 						</b-table>
+							<b-pagination v-model="order.currentPage" :total-rows="rowsTableorder" :per-page="order.perPage" aria-controls="order"></b-pagination>
 					</div>
-					<div v-if="showInactivos">
-						<div class="text-center">
-							<h5 class="mb-0 text-center">Inventario<i class="fas fa-shopping-cart mr-2"></i>
-							</h5><br>
-							<div class="form-control py-2">
-								<label>
-									<strong>Filter to Product</strong>
-								</label>
-								<input class="form-control" v-model="inactiveFitler">
-							</div>
-						</div>
-						<b-table striped hover :items="product.inactiveProducts" :filter="inactiveFitler" :fields="product.fields">
-							<template #cell(category)="row">
-								${row.item.category.name}
-							</template>
-						</b-table>
+
 					</div>
 				</div>
 			</div>
