@@ -81,7 +81,6 @@ class ProductsController extends AbstractController
                 $this->getParameter('products_photos'),
                 $photoFileName
             );
-            $data['photo'] = $photoFileName;
         }
        
         $product = new Products();
@@ -107,7 +106,7 @@ class ProductsController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $productsRepository = $entityManager->getRepository(Products::class);
-        $data = json_decode($request->getContent(), true);
+        $data = $request->request->all();
         // Buscar el producto por el código
         $product = $productsRepository->findOneBy(['id' => $data['id']]);
 

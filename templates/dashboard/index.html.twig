@@ -54,7 +54,6 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="col py-3">
 					<div class="text-center">
 						<h2 class="mb-0 text-center">Dashboard Ecommerce
@@ -121,12 +120,12 @@
 												</b-col>
 												<b-col sm="12" md="6">
 													<b-form-group clas id="category-input-group" label="Categoría" label-for="category-input">
-														<b-form-select class="form-select" id="category-input" v-model="product.category" :options="product.categories" value="id" class="form-select-lg" />
+														<b-form-select class="form-select" id="category-input" v-model="product.category" :options="product.categories" value="id" class="form-select-lg"/>
 													</b-form-group>
 												</b-col>
 												<b-col class="my-2" sm="12">
 													<div>
-														<input @change="onFileChange" type="file" class="form-control-file" id="image" accept="image/jpeg, image/png, image/gif" >
+														<input @change="onFileChange" type="file" class="form-control-file" id="image" accept="image/jpeg, image/png, image/gif">
 													</div>
 												</b-col>
 
@@ -137,7 +136,6 @@
 											</div>
 										</b-form>
 									</div>
-
 								</div>
 							</div>
 						</div>
@@ -237,12 +235,19 @@
 								${(row.item.status) ? 'Activo': 'Inactivo'}
 							</label>
 						</template>
+						<template #cell(photo)="row">
+							<b-button v-b-tooltip.hover.bottom="verfoto(row.item.title)" @click="updateProductPhoto(row.item.photo)" variant="info"  class="rounded-circle">
+								<i class="fa-solid fa-eye"></i>
+							</b-button>
+						</template>
 						<template #cell(actions)="row">
 							<button @click="updateProduct(row)" class="btn btn-sm btn-warning">
 								<i class="fas fa-edit"></i>
 								Editar
 							</button>
 						</template>
+
+
 					</b-table>
 					<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts" :per-page="product.perPage" aria-controls="products"></b-pagination>
 				</div>
@@ -289,7 +294,6 @@
 					</b-table>
 					<b-pagination v-model="order.currentPage" :total-rows="rowsTableOrder" :per-page="order.perPage" aria-controls="order"></b-pagination>
 				</div>
-
 			</div>
 		</div>
 	</div>

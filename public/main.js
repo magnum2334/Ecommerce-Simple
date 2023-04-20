@@ -40,7 +40,7 @@ let app = new Vue({
             stock: null,
             status: null,
             category: null,
-            fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status', 'actions'],
+            fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status', 'photo', 'actions'],
             fieldsOrder: ['title', 'description', 'price', 'category'],
             products: [],
             perPage: 5,
@@ -496,6 +496,12 @@ let app = new Vue({
                 });
             }
         },
-
+        updateProductPhoto() {
+            
+        },
+        verfoto(code){
+            return 'Ver producto ' + code;
+        } 
+        
     },
 })
