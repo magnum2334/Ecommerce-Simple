@@ -8,9 +8,7 @@ let app = new Vue({
         showOrdenes: false,
         showInactivos: false,
         //filters
-        titleFilter: '',
-        categoryFilter: '',
-        codeFilter: '',
+        productAdminFilter: '',
         nameFilter: '',
         emailFilter: '',
         inactiveFitler: '',
@@ -27,7 +25,12 @@ let app = new Vue({
         searchInputProduct: '',
         changesSearch: false,
         category: {
-            name: ''
+            name: '',
+            fields: ['name', 'actions'],
+            perPage: 5,
+            currentPage: 1,
+            copy:[],
+            categoryFilter:''
         },
         product: {
             title: '',
@@ -37,15 +40,16 @@ let app = new Vue({
             stock: null,
             status: null,
             category: null,
-            fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status'],
+            fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status', 'actions'],
             fieldsOrder: ['title', 'description', 'price', 'category'],
             products: [],
             perPage: 5,
             currentPage: 1,
-            inactiveProducts: [],
             categories: [],
             existProducts: false,
             copy: [],
+            productsActive:[],
+            id: ''
 
         },
         customer: {
@@ -76,14 +80,12 @@ let app = new Vue({
         this.products()
         this.customers()
         this.orders()
-
     },
     mounted() {
 
         if (localStorage.getItem('customer') !== null) {
             this.customer.customer_id = JSON.parse(localStorage.getItem('customer'))
             this.customer.user = JSON.parse(localStorage.getItem('user'))
-            console.log(this.customer.user)
             this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' + this.customer.customer_id
             this.isLoggin = true
         }
@@ -91,6 +93,7 @@ let app = new Vue({
     computed: {
         filteredProducts() {
             return this.product.products.filter((product) => {
+
                 let titleFilter = product.title.toLowerCase().includes(this.titleFilter.toLowerCase());
                 let categoryFilter = product.category.name.toLowerCase().includes(this.categoryFilter.toLowerCase());
                 let codeFilter = product.code.toLowerCase().includes(this.codeFilter.toLowerCase());
@@ -98,13 +101,16 @@ let app = new Vue({
             })
         },
         rowsTableProducts() {
-            return this.filteredProducts.length
+            return this.product.products.length
         },
-        rowsTablecustomer(){
+        rowsTablecustomer() {
             return this.customer.customers.length
         },
-        rowsTableOrder(){
+        rowsTableOrder() {
             return this.order.orders.length
+        },
+        rowsTableCategories() {
+            return this.product.categories.length
         }
     },
 
@@ -149,7 +155,6 @@ let app = new Vue({
                 category_id: this.product.category,
                 status: true,
             };
-
             try {
                 const response = await axios.post('http://127.0.0.1:8000/create/product', data);
                 Swal.fire({
@@ -159,6 +164,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.categories();
                 this.products();
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
@@ -169,9 +175,9 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
-                this.created();
             }
         },
+
         async submitFormCategory() {
             let data = {
                 name: this.category.name,
@@ -187,6 +193,7 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
                 this.categories();
+                this.products();
 
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
@@ -201,6 +208,7 @@ let app = new Vue({
         },
         async categories() {
             const categories = await axios.get('http://localhost:8000/categories');
+            this.category.copy = [...categories.data]
             this.product.categories = [
                 { value: null, text: 'Seleccione una categoría', disabled: true },
                 ...categories.data.map(({ id, name }) => ({ value: id, text: name }))
@@ -210,31 +218,19 @@ let app = new Vue({
             const prducts = await axios.get('http://localhost:8000/products')
             this.product.existProducts = true
             this.product.products = prducts.data
-                .filter(item => item.status === true)
-                .map(item => ({
-                    id: item.id,
-                    title: item.title,
-                    description: item.description,
-                    code: item.code,
-                    price: "$" + item.price,
-                    stock: item.stock,
-                    status: item.status ? "available" : "not available",
-                    category: item.category,
-                    actions: null
-                }))
-            this.product.copy = [...this.product.products]
-            this.product.inactiveProducts = prducts.data
-                .filter(item => item.status === false)
-                .map(item => ({
-                    title: item.title,
-                    description: item.description,
-                    code: item.code,
-                    price: item.price,
-                    stock: item.stock,
-                    status: item.status ? "available" : "not available",
-                    category: item.category,
-                    actions: null
-                }))
+            this.product.productsActive = this.product.products.filter(item => item.status === true)
+            .map(item => ({
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                code: item.code,
+                price: "$" + item.price.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }),
+                stock: item.stock,
+                status: item.status ? "Activo" : "Inavilitado",
+                category: item.category,
+                actions: null
+            }))
+            this.product.copy = [...this.product.productsActive]
         },
         async customers() {
             const customer = await axios.get('http://localhost:8000/customers')
@@ -304,7 +300,7 @@ let app = new Vue({
                     email: this.customer.emailLogin,
                     password: this.customer.passwordLogin,
                 };
-                
+
                 const response = await axios.post('http://127.0.0.1:8000/dashboard/user', data);
                 Swal.fire({
                     icon: 'success',
@@ -314,15 +310,16 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
                 if (this.customer.emailLogin == 'admin@admin.com' && this.customer.passwordLogin == 'error404') {
-                    window.location.href = 'http://127.0.0.1:8000/dashboard/1'
+                    window.location.href = 'http://127.0.0.1:8000/dashboard'
                 } else {
-                    console.log( response.data.user)
                     this.isLoggin = true
                     this.customer.customer_id = response.data.user.id
                     this.linkCustomer = 'http://127.0.0.1:8000/dashboard/user/' + response.data.user.id
                     localStorage.setItem('customer', response.data.user.id)
-
                     localStorage.setItem('user', JSON.stringify(response.data.user))
+                    setTimeout(() => {
+                    window.location.href = 'http://127.0.0.1:8000/'
+                   }, 2000);
                 }
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
@@ -390,7 +387,6 @@ let app = new Vue({
                         this.cart = [];
                     }
                 } catch (error) {
-                    console.error(error);
                     Swal.fire({
                         title: '¡Error!',
                         text: 'Ha ocurrido un error al crear la orden: ' + error.response.data.message,
@@ -412,17 +408,82 @@ let app = new Vue({
             this.changesSearch = true
             setTimeout(() => {
                 if (this.searchInputProduct == '') {
-                    this.product.products = this.product.copy
+                    this.product.productsActive = this.product.copy
                 } else {
-                    const searchTerm = this.searchInputProduct.toLowerCase();
-                    this.product.products = this.product.products.filter(product => {
+                    console.log(this.product.productsActive)
+                    this.product.productsActive = this.product.productsActive.filter(product => {
                         const title = product.title.toLowerCase();
                         const description = product.description.toLowerCase();
-                        return title.includes(searchTerm) || description.includes(searchTerm);
+                        return title.includes(this.searchInputProduct.toLowerCase()) || description.includes(this.searchInputProduct.toLowerCase());
                     });
                 }
             }, 1000);
             this.changesSearch = false
-        }
+        },
+        
+        async updateProduct(value) {
+            let data = {
+                id: value.item.id,
+                title:  value.item.title,
+                description: value.item.description,
+                code: value.item.code,
+                stock: value.item.stock,
+                price: value.item.price,
+                status:  value.item.status,
+                category: value.item.category,
+            }
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/update/product', data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Producto se actualiza exitosamente',
+                    text: `El producto con código ${response.data.code} ha sido actualizado con éxito.`,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+                this.categories();
+                this.products();
+            } catch (error) {
+                let errorMessage = error.response.data.error || 'Hubo un error al intentar actualizar el producto. Por favor, intenta de nuevo más tarde.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al actualizar el producto',
+                    text: errorMessage,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+                
+            }
+        },
+        async updateCategory(value) {
+            let data = {
+                newName: value.item.name,
+                categoryId: value.item.id,
+            };
+
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/update/category', data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Categoria se actuaiza exitosamente',
+                    text: `La Categoria con el nombre:  ${response.data.name} ha sido actualizado con éxito.`,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+                this.categories();
+                this.products();
+
+            } catch (error) {
+                let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al crear el la categoria',
+                    text: errorMessage,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        },
+        
     },
 })

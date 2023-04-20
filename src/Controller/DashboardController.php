@@ -28,7 +28,8 @@ class DashboardController extends AbstractController
     public function getCategories(ManagerRegistry $doctrine): JsonResponse
     {
         $entityManager = $doctrine->getManager();
-        $categories = $entityManager->getRepository(Category::class)->findAll();
+        $categories = $entityManager->getRepository(Category::class)
+            ->findBy([], ['id' => 'ASC']);
 
         return $this->json($categories);
     }
@@ -36,12 +37,16 @@ class DashboardController extends AbstractController
     public function getProducts(ManagerRegistry $doctrine): JsonResponse
     {
         $entityManager = $doctrine->getManager();
-        $products = $entityManager->getRepository(Products::class)
-                    ->findBy([], ['id' => 'ASC']);
+        $repository = $entityManager->getRepository(Products::class, ProductsRepository::class);
+        $products = $repository->createQueryBuilder('p')
+            ->orderBy('p.status', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->json($products);
     }
-    
+
+
     #[Route('/customers', name: 'app_customers', methods: ['GET'])]
     public function getCustomers(ManagerRegistry $doctrine): JsonResponse
     {

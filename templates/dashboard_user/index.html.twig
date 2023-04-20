@@ -15,12 +15,6 @@
 						<a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
 							<span class="fs-5 d-none d-sm-inline">Menu</span>
 						</a>
-						<div class="btn-group-vertical w-100" role="group" aria-label="Menu">
-							<button type="button" class="btn btn-outline-light w-100 mb-2" v-on:click="hideText('Ordenes')">
-								<i class="bi bi-people-fill me-2"></i>
-								<span class="d-none d-sm-inline">Ordenes</span>
-							</button>
-						</div>
 						<hr>
 						<div class="dropdown pb-4">
 							<button class=" btn btn-sm bg-dark dropdown-toggle" type="button" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -104,23 +98,7 @@
 							</template>
 						</b-table>
 					</div>
-					<div v-if="showInactivos">
-						<div class="text-center">
-							<h5 class="mb-0 text-center">Inventario<i class="fas fa-shopping-cart mr-2"></i>
-							</h5><br>
-							<div class="form-control py-2">
-								<label>
-									<strong>uscar...</strong>
-								</label>
-								<input class="form-control" v-model="inactiveFitler">
-							</div>
-						</div>
-						<b-table striped hover :items="product.inactiveProducts" :filter="inactiveFitler" :fields="product.fields">
-							<template #cell(category)="row">
-								${row.item.category.name}
-							</template>
-						</b-table>
-					</div>
+					
 				</div>
 			</div>
 		</div>

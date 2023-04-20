@@ -29,7 +29,7 @@
 								<i class="bi bi-people-fill me-2"></i>
 								<span class="d-none d-sm-inline">Ordenes</span>
 							</button>
-							
+
 						</div>
 						<hr>
 						<div class="dropdown pb-4">
@@ -44,7 +44,9 @@
 								<li>
 									<a class="dropdown-item" href="#">Perfil</a>
 								</li>
-								<li><hr class="dropdown-divider"></li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
 								<li>
 									<a class="dropdown-item" href="/">Cerrar</a>
 								</li>
@@ -68,171 +70,229 @@
 								<button type="button" class="btn btn-success btn-lg py-1 border-none px-4" data-bs-toggle="modal" data-bs-target="#modalCreateProduct">
 									<i class="fas fa-plus me-2"></i>Añadir producto
 								</button>
+								<div>
+									<button type="button" class="btn btn-warning btn-lg py-1 mx-1 border-none px-4" data-bs-toggle="modal" data-bs-target="#modalModifyCategory">
+										<i class="fas fa-edit"></i>
+									</i>Modificar categoria
+								</button>
 								<button type="button" class="btn btn-success btn-lg py-1 px-4" data-bs-toggle="modal" data-bs-target="#modalCreateCategory">
 									<i class="fas fa-plus me-2"></i>Añadir categoría
 								</button>
 							</div>
-							<div class="modal fade" id="modalCreateProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog modal-lg">
-									<div class="modal-content">
-										<div class="modal-header bg-primary text-light">
-											<h5 class="modal-title" id="exampleModalLabel">Agregar Producto</h5>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body">
-											<b-form @submit.prevent="submitFormProduct">
-												<b-row>
-													<b-col sm="12" md="6">
-														<b-form-group id="title-input-group" label="Título" label-for="title-input">
-															<b-form-input id="title-input" v-model="product.title" type="text" placeholder="Ingrese el título del producto" size="lg"/>
-														</b-form-group>
-													</b-col>
-													<b-col sm="12" md="6">
-														<b-form-group id="description-input-group" label="Descripción" label-for="description-input">
-															<b-form-input id="description-input" v-model="product.description" type="text" placeholder="Ingrese la descripción del producto" size="lg"/>
-														</b-form-group>
-													</b-col>
-												</b-row>
-												<b-row>
-													<b-col sm="12" md="6">
-														<b-form-group id="code-input-group" label="Código" label-for="code-input">
-															<b-form-input id="code-input" v-model="product.code" type="text" placeholder="Ingrese el código del producto" size="lg"/>
-														</b-form-group>
-													</b-col>
-													<b-col sm="12" md="6">
-														<b-form-group id="price-input-group" label="Precio" label-for="price-input">
-															<b-form-input id="price-input" v-model="product.price" type="number" step="0.01" placeholder="Ingrese el precio del producto" size="lg"/>
-														</b-form-group>
-													</b-col>
-												</b-row>
-												<b-row>
-													<b-col sm="12" md="6">
-														<b-form-group id="stock-input-group" label="Stock" label-for="stock-input">
-															<b-form-input id="stock-input" v-model="product.stock" type="number" placeholder="Ingrese el stock del producto" size="lg"/>
-														</b-form-group>
-													</b-col>
-													<b-col sm="12" md="6">
-														<b-form-group clas id="category-input-group" label="Categoría" label-for="category-input">
-															<b-form-select class="form-select" id="category-input" v-model="product.category" :options="product.categories" value="id" class="form-select-lg" @change="console.log(product.category)"/>
-														</b-form-group>
-													</b-col>
-												</b-row>
-												<div class="d-flex justify-content-center mt-4">
-													<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!product.title || !product.description || !product.code || !product.price || !product.stock">Guardar</b-button>
-													<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
-												</div>
-											</b-form>
-										</div>
-
+						</div>
+						<div class="modal fade" id="modalCreateProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-primary text-light">
+										<h5 class="modal-title" id="exampleModalLabel">Agregar Producto</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
-								</div>
-							</div>
-							<div class="modal fade" id="modalCreateCategory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog modal-lg">
-									<div class="modal-content">
-										<div class="modal-header bg-primary text-light">
-											<h5 class="modal-title" id="exampleModalLabel">Agregar Categoria</h5>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body">
-											<b-form @submit.prevent="submitFormCategory">
-												<b-form-group id="name-input-group" label="Nombre" label-for="name-input">
-													<b-form-input id="name-input" v-model="category.name" type="text" placeholder="Ingrese el nombre de la categoría" size="lg"/>
-												</b-form-group>
-												<div class="d-flex justify-content-center mt-4">
-													<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!category.name">Guardar</b-button>
-													<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
-												</div>
-											</b-form>
-										</div>
+									<div class="modal-body">
+										<b-form @submit.prevent="submitFormProduct">
+											<b-row>
+												<b-col sm="12" md="6">
+													<b-form-group id="title-input-group" label="Título" label-for="title-input">
+														<b-form-input id="title-input" v-model="product.title" type="text" placeholder="Ingrese el título del producto" size="lg"/>
+													</b-form-group>
+												</b-col>
+												<b-col sm="12" md="6">
+													<b-form-group id="description-input-group" label="Descripción" label-for="description-input">
+														<b-form-input id="description-input" v-model="product.description" type="text" placeholder="Ingrese la descripción del producto" size="lg"/>
+													</b-form-group>
+												</b-col>
+											</b-row>
+											<b-row>
+												<b-col sm="12" md="6">
+													<b-form-group id="code-input-group" label="Código" label-for="code-input">
+														<b-form-input id="code-input" v-model="product.code" type="text" placeholder="Ingrese el código del producto" size="lg"/>
+													</b-form-group>
+												</b-col>
+												<b-col sm="12" md="6">
+													<b-form-group id="price-input-group" label="Precio" label-for="price-input">
+														<b-form-input id="price-input" v-model="product.price" type="number" min="1" step="0.01" placeholder="Ingrese el precio del producto" size="lg"/>
+													</b-form-group>
+												</b-col>
+											</b-row>
+											<b-row>
+												<b-col sm="12" md="6">
+													<b-form-group id="stock-input-group" label="Stock" label-for="stock-input">
+														<b-form-input id="stock-input" v-model="product.stock" type="number" min="1" placeholder="Ingrese el stock del producto" size="lg"/>
+													</b-form-group>
+												</b-col>
+												<b-col sm="12" md="6">
+													<b-form-group clas id="category-input-group" label="Categoría" label-for="category-input">
+														<b-form-select class="form-select" id="category-input" v-model="product.category" :options="product.categories" value="id" class="form-select-lg" />
+													</b-form-group>
+												</b-col>
+												<b-col class="my-2" sm="12">
+													<div>
+														<input type="file" class="form-control-file" id="image" accept="image/jpeg, image/png, image/gif" >
+													</div>
+												</b-col>
 
+											</b-row>
+											<div class="d-flex justify-content-center mt-4">
+												<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!product.title || !product.description || !product.code || !product.price || !product.stock ">Guardar</b-button>
+												<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
+											</div>
+										</b-form>
 									</div>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12 col-md-4">
-								<div class=" form-control py-2">
-									<label class="from-label">
-										<strong>Filter to Tilte</strong>
-									</label>
-									<input placeholder="filter..." class="form-control" v-model="titleFilter">
-								</div>
-							</div>
-							<div class="col-12 col-md-4">
-								<div class="form-control py-2">
-									<label>
-										<strong>Filter to Category</strong>
-									</label>
-									<input placeholder="filter..." class="form-control" v-model="categoryFilter">
-								</div>
-							</div>
-							<div class="col-12 col-md-4">
-								<div class="form-control py-2">
-									<label class="from-label">
-										<strong>Filter to Code</strong>
-									</label>
-									<input placeholder="filter..." class="form-control" v-model="codeFilter">
-								</div>
-							</div>
-						</div>
-						<b-table striped hover :items="filteredProducts" :fields="product.fields" id="products" :per-page="product.perPage" :current-page="product.currentPage">
-							<template #cell(category)="row">
-								${row.item.category.name}
-							</template>
-						</b-table>
-						<p class="mt-3">Current Page: ${ product.currentPage }</p>
-						<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts" :per-page="product.perPage" aria-controls="products"></b-pagination>
-					</div>
-					<div v-if="showUsers">
-						<div class="text-center">
-							<h5 class="mb-0 text-center">Clientes
-								<i class="fas fa-users mr-2"></i>
-							</h5><br>
 
-							<div class="form-control py-2">
-								<label>
-									<strong>Filter to Fullname</strong>
-								</label>
-								<input placeholder="filter..." class="form-control" v-model="nameFilter">
+								</div>
 							</div>
 						</div>
-						<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields" id="customer" :per-page="customer.perPage" :current-page="customer.currentPage"></b-table>
-						<b-pagination v-model="customer.currentPage" :total-rows="rowsTablecustomer" :per-page="customer.perPage" aria-controls="customer"></b-pagination>
-					</div>
-					<div v-if="showOrdenes">
-						<div class="text-center">
-							<h5 class="mb-0 text-center">Ordenes
-								<i class="fas fa-users mr-2"></i>
-							</h5><br>
-							<div class="form-control py-2">
-								<label>
-									<strong>Filter to Orden</strong>
-								</label>
-								<input placeholder="filter..." class="form-control" v-model="ordenesFilter">
+						<div class="modal fade" id="modalCreateCategory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-primary text-light">
+										<h5 class="modal-title" id="exampleModalLabel">Agregar Categoria</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<b-form @submit.prevent="submitFormCategory">
+											<b-form-group id="name-input-group" label="Nombre" label-for="name-input">
+												<b-form-input id="name-input" v-model="category.name" type="text" placeholder="Ingrese el nombre de la categoría" size="lg"/>
+											</b-form-group>
+											<div class="d-flex justify-content-center mt-4">
+												<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!category.name">Guardar</b-button>
+												<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
+											</div>
+										</b-form>
+									</div>
+
+								</div>
 							</div>
 						</div>
-						<b-table striped hover :filter="ordenesFilter" :items="order.orders" id="order">
-							<template #cell(products)="row">
-								<ul>
-									<li v-for="product in row.item.products">
-										<strong>Nombre:</strong>${product.productName},
-										<br>
-										<strong>Cantidad</strong>:${product.quantity}
-										<br>
-										<strong>Precio</strong>:${product.price}
-									</li>
-								</ul>
-							</template>
-						</b-table>
-							<b-pagination v-model="order.currentPage" :total-rows="rowsTableorder" :per-page="order.perPage" aria-controls="order"></b-pagination>
+						<div class="modal fade" id="modalModifyCategory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-warning text-light">
+										<h5 class="modal-title" id="exampleModalLabel">Modificar Categoria</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div class=" form-control py-2">
+											<label class="from-label">
+												<strong>Buscar Nombre</strong>
+											</label>
+											<input placeholder="filter..." class="form-control" v-model="category.categoryFilter">
+										</div>
+										<b-table striped hover :items="category.copy" :filter="category.categoryFilter" :fields="category.fields" id="categories" :per-page="category.perPage" :current-page="category.currentPage">
+											<template #cell(name)="row">
+												<input v-model="row.item.name" class="form-control" type="text">
+											</template>
+											<template #cell(actions)="row">
+												<button @click="updateCategory(row)" class="btn btn-sm btn-warning">
+													<i class="fas fa-edit"></i>
+													Editar
+												</button>
+											</template>
+										</b-table>
+										<b-pagination v-model="category.currentPage" :total-rows="rowsTableCategories" :per-page="category.perPage" aria-controls="categories"></b-pagination>
+									</div>
+
+								</div>
+							</div>
+						</div>
 					</div>
+					<div class="row">
+						<div class="col-12 ">
+							<div class=" form-control py-2">
+								<label class="from-label">
+									<strong>Buscar...</strong>
+								</label>
+								<input placeholder="filter..." class="form-control" v-model="productAdminFilter">
+							</div>
+						</div>
 
 					</div>
+					<!-- <pre>	<code>${product.products}</code></pre> -->
+					<b-table striped hover :items="product.products" :filter="productAdminFilter" :fields="product.fields" id="products" :per-page="product.perPage" :current-page="product.currentPage">
+						<template #cell(category)="row">
+							${row.item.category.name}
+						</template>
+						<template #cell(title)="row">
+							<input v-model="row.item.title" class="form-control" style="text-align: center;">
+						</template>
+						<template #cell(description)="row">
+							<textarea v-model="row.item.description" class="form-control" style="text-align: center;"></textarea>
+						</template>
+						<template #cell(code)="row">
+							<input v-model="row.item.code" class="form-control" style="text-align: center;">
+						</template>
+						<template #cell(price)="row">
+							<input v-model="row.item.price" type="number" min="1" class="form-control" style="text-align: center;">
+						</template>
+						<template #cell(stock)="row">
+							<input v-model="row.item.stock" type="number" min="1" class="form-control" style="text-align: center;">
+						</template>
+						<template #cell(category)="row">
+							<b-form-group clas id="category-input-group" label-for="category-input">
+								<b-form-select class="form-select" id="category-input" v-model="row.item.category.id" :options="product.categories" value="id" class="form-select-lg"/>
+							</b-form-group>
+						</template>
+						<template #cell(status)="row">
+							<input v-model="row.item.status" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+							<label class="form-check-label" for="flexCheckDefault">
+								${(row.item.status) ? 'Activo': 'Inactivo'}
+							</label>
+						</template>
+						<template #cell(actions)="row">
+							<button @click="updateProduct(row)" class="btn btn-sm btn-warning">
+								<i class="fas fa-edit"></i>
+								Editar
+							</button>
+						</template>
+					</b-table>
+					<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts" :per-page="product.perPage" aria-controls="products"></b-pagination>
 				</div>
+				<div v-if="showUsers">
+					<div class="text-center">
+						<h5 class="mb-0 text-center">Clientes
+							<i class="fas fa-users mr-2"></i>
+						</h5><br>
+
+						<div class="form-control py-2">
+							<label>
+								<strong>Filter to Fullname</strong>
+							</label>
+							<input placeholder="filter..." class="form-control" v-model="nameFilter">
+						</div>
+					</div>
+					<b-table striped hover :items="customer.customers" :filter="nameFilter" :fields="customer.fields" id="customer" :per-page="customer.perPage" :current-page="customer.currentPage"></b-table>
+					<b-pagination v-model="customer.currentPage" :total-rows="rowsTablecustomer" :per-page="customer.perPage" aria-controls="customer"></b-pagination>
+				</div>
+				<div v-if="showOrdenes">
+					<div class="text-center">
+						<h5 class="mb-0 text-center">Ordenes
+							<i class="fas fa-users mr-2"></i>
+						</h5><br>
+						<div class="form-control py-2">
+							<label>
+								<strong>Filter to Orden</strong>
+							</label>
+							<input placeholder="filter..." class="form-control" v-model="ordenesFilter">
+						</div>
+					</div>
+					<b-table striped hover :filter="ordenesFilter" :items="order.orders" id="order">
+						<template #cell(products)="row">
+							<ul>
+								<li v-for="product in row.item.products">
+									<strong>Nombre:</strong>${product.productName},
+									<br>
+									<strong>Cantidad</strong>:${product.quantity}
+									<br>
+									<strong>Precio</strong>:${product.price}
+								</li>
+							</ul>
+						</template>
+					</b-table>
+					<b-pagination v-model="order.currentPage" :total-rows="rowsTableOrder" :per-page="order.perPage" aria-controls="order"></b-pagination>
+				</div>
+
 			</div>
 		</div>
-		<!-- Navbar -->
-	</header>
+	</div>
 
-{% endblock %}
+	<!-- Navbar -->
+</header>{% endblock %}

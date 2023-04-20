@@ -34,10 +34,5 @@ class Category
 
         return $this;
     }
-    public function generateFakeData()
-    {
-        $faker = Factory::create();
-        $this->setName($faker->word);
-    }
     
 }
