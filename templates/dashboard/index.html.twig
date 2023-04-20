@@ -126,13 +126,13 @@
 												</b-col>
 												<b-col class="my-2" sm="12">
 													<div>
-														<input type="file" class="form-control-file" id="image" accept="image/jpeg, image/png, image/gif" >
+														<input @change="onFileChange" type="file" class="form-control-file" id="image" accept="image/jpeg, image/png, image/gif" >
 													</div>
 												</b-col>
 
 											</b-row>
 											<div class="d-flex justify-content-center mt-4">
-												<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!product.title || !product.description || !product.code || !product.price || !product.stock ">Guardar</b-button>
+												<b-button type="submit" variant="primary" class="me-3" size="lg" :disabled="!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category || !product.photoExists">Guardar</b-button>
 												<b-button type="button" variant="secondary" data-bs-dismiss="modal" size="lg">Cancelar</b-button>
 											</div>
 										</b-form>

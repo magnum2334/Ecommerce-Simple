@@ -29,8 +29,8 @@ let app = new Vue({
             fields: ['name', 'actions'],
             perPage: 5,
             currentPage: 1,
-            copy:[],
-            categoryFilter:''
+            copy: [],
+            categoryFilter: ''
         },
         product: {
             title: '',
@@ -48,8 +48,10 @@ let app = new Vue({
             categories: [],
             existProducts: false,
             copy: [],
-            productsActive:[],
-            id: ''
+            productsActive: [],
+            id: '',
+            photo: '',
+            photoExists: false
 
         },
         customer: {
@@ -145,18 +147,28 @@ let app = new Vue({
                 this.cardSelect = false
             }
         },
+        onFileChange(event) {
+            console.log(event)
+            this.product.photo = event.target.files[0];
+            this.product.photoExists = true;
+        },
         async submitFormProduct() {
-            let data = {
-                title: this.product.title,
-                code: this.product.code,
-                description: this.product.description,
-                price: this.product.price,
-                stock: this.product.stock,
-                category_id: this.product.category,
-                status: true,
-            };
+            let formData = new FormData();
+            formData.append('title', this.product.title);
+            formData.append('code', this.product.code);
+            formData.append('description', this.product.description);
+            formData.append('price', this.product.price);
+            formData.append('stock', this.product.stock);
+            formData.append('category_id', this.product.category);
+            formData.append('status', true);
+            formData.append('photo', this.product.photo);
+
             try {
-                const response = await axios.post('http://127.0.0.1:8000/create/product', data);
+                const response = await axios.post('http://127.0.0.1:8000/create/product', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
                 Swal.fire({
                     icon: 'success',
                     title: 'Producto creado exitosamente',
@@ -219,17 +231,17 @@ let app = new Vue({
             this.product.existProducts = true
             this.product.products = prducts.data
             this.product.productsActive = this.product.products.filter(item => item.status === true)
-            .map(item => ({
-                id: item.id,
-                title: item.title,
-                description: item.description,
-                code: item.code,
-                price: "$" + item.price.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }),
-                stock: item.stock,
-                status: item.status ? "Activo" : "Inavilitado",
-                category: item.category,
-                actions: null
-            }))
+                .map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    description: item.description,
+                    code: item.code,
+                    price: "$" + item.price.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }),
+                    stock: item.stock,
+                    status: item.status ? "Activo" : "Inavilitado",
+                    category: item.category,
+                    actions: null
+                }))
             this.product.copy = [...this.product.productsActive]
         },
         async customers() {
@@ -318,8 +330,8 @@ let app = new Vue({
                     localStorage.setItem('customer', response.data.user.id)
                     localStorage.setItem('user', JSON.stringify(response.data.user))
                     setTimeout(() => {
-                    window.location.href = 'http://127.0.0.1:8000/'
-                   }, 2000);
+                        window.location.href = 'http://127.0.0.1:8000/'
+                    }, 2000);
                 }
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
@@ -420,16 +432,16 @@ let app = new Vue({
             }, 1000);
             this.changesSearch = false
         },
-        
+
         async updateProduct(value) {
             let data = {
                 id: value.item.id,
-                title:  value.item.title,
+                title: value.item.title,
                 description: value.item.description,
                 code: value.item.code,
                 stock: value.item.stock,
                 price: value.item.price,
-                status:  value.item.status,
+                status: value.item.status,
                 category: value.item.category,
             }
             try {
@@ -452,7 +464,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
-                
+
             }
         },
         async updateCategory(value) {
@@ -484,6 +496,6 @@ let app = new Vue({
                 });
             }
         },
-        
+
     },
 })

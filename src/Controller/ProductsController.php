@@ -18,12 +18,11 @@ class ProductsController extends AbstractController
     public function createProduct(Request $request, ManagerRegistry $doctrine): JsonResponse
     {
         // Parse request data
-        $data = json_decode($request->getContent(), true);
 
         // Validate required fields
         $requiredFields = ['title', 'description', 'code', 'price', 'stock', 'status'];
         foreach ($requiredFields as $field) {
-            if (!isset($data[$field])) {
+            if (!$request->request->has($field)) {
                 return $this->json([
                     'error' => sprintf('"%s" es necesario', $field),
                 ], Response::HTTP_BAD_REQUEST);
@@ -32,50 +31,42 @@ class ProductsController extends AbstractController
 
         $entityManager = $doctrine->getManager();
         // Check if product with title already exists
-        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['title' => $data['title']]);
+        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['title' => $request->request->get('title')]);
         if ($existingProduct) {
             return $this->json([
-                'error' => sprintf('El Producto con el titulo "%s" ya existe, intenta otro.', $data['title']),
+                'error' => sprintf('El Producto con el titulo "%s" ya existe, intenta otro.', $request->request->get('title')),
             ], Response::HTTP_BAD_REQUEST);
         }
         // Check if product with descripcion already exists
-        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['description' => $data['description']]);
+        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['description' => $request->request->get('description')]);
         if ($existingProduct) {
             return $this->json([
-                'error' => sprintf('El Producto con la descriocion "%s" ya existe, intenta otro.', $data['description']),
+                'error' => sprintf('El Producto con la descriocion "%s" ya existe, intenta otro.', $request->request->get('description')),
             ], Response::HTTP_BAD_REQUEST);
         }
         // Check if product with description already exists
-        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['code' => $data['code']]);
+        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['code' => $request->request->get('code')]);
         if ($existingProduct) {
             return $this->json([
-                'error' => sprintf('El Producto con el codigo "%s" ya existe, intenta otro.', $data['code']),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Check if product with code already exists
-        $existingProduct = $entityManager->getRepository(Products::class)->findOneBy(['code' => $data['code']]);
-        if ($existingProduct) {
-            return $this->json([
-                'error' => sprintf('El Producto con el codigo "%s" ya existe, intenta otro.', $data['code']),
+                'error' => sprintf('El Producto con el codigo "%s" ya existe, intenta otro.', $request->request->get('code')),
             ], Response::HTTP_BAD_REQUEST);
         }
 
         // Validate price and stock
-        if (!is_numeric($data['price']) || $data['price'] < 0) {
+        if (!is_numeric($request->request->get('price')) ||$request->request->get('price') < 0) {
             return $this->json([
                 'error' => 'Valor invalido para precio del producto',
             ], Response::HTTP_BAD_REQUEST);
         }
-        if (!is_numeric($data['stock']) || $data['stock'] < 0) {
+        if (!is_numeric($request->request->get('stock')) ||  $request->request->get('stock') < 0) {
             return $this->json([
                 'error' => 'valor invalido para la cantidad del producto',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         // Check if category exists
-        if (isset($data['category_id'])) {
-            $category = $entityManager->getRepository(Category::class)->find($data['category_id']);
+        if ($request->request->get('category_id')) {
+            $category = $entityManager->getRepository(Category::class)->find($request->request->get('category_id'));
             if (!$category) {
                 return $this->json([
                     'error' => 'Categoria "%s" no existe',
@@ -84,27 +75,25 @@ class ProductsController extends AbstractController
         }
 
         $product = new Products();
-        $product->setTitle($data['title']);
-        $product->setDescription($data['description']);
-        $product->setCode($data['code']);
-        $product->setPrice($data['price']);
-        $product->setStock($data['stock']);
-        $product->setStatus($data['status']);
+        $product->setTitle($request->request->get('title'));
+        $product->setDescription($request->request->get('description'));
+        $product->setCode($request->request->get('code'));
+        $product->setPrice($request->request->get('price'));
+        $product->setStock($request->request->get('stock'));
+        $product->setStatus($request->request->get('status'));
         if (isset($category)) {
             $product->setCategory($category);
         }
-
-
         $entityManager->persist($product);
         $entityManager->flush();
-
         return $this->json([
             'message' => 'El producto se creo!! ',
-            'code' => $data['code']
+            'code' =>  $product->getCode()
         ], Response::HTTP_CREATED);
+        
     }
     #[Route('update/product', name: 'product_update',  methods: ['POST'])]
-    public function update( Request $request, ManagerRegistry $doctrine): Response
+    public function update(Request $request, ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
         $productsRepository = $entityManager->getRepository(Products::class);
