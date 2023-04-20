@@ -94,12 +94,58 @@ class ProductsController extends AbstractController
             $product->setCategory($category);
         }
 
+
         $entityManager->persist($product);
         $entityManager->flush();
 
         return $this->json([
             'message' => 'El producto se creo!! ',
             'code' => $data['code']
+        ], Response::HTTP_CREATED);
+    }
+    #[Route('update/product', name: 'product_update',  methods: ['POST'])]
+    public function update( Request $request, ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $productsRepository = $entityManager->getRepository(Products::class);
+        $data = json_decode($request->getContent(), true);
+        // Buscar el producto por el código
+        $product = $productsRepository->findOneBy(['id' => $data['id']]);
+
+
+        if (isset($data['category'])) {
+            $category = $entityManager->getRepository(Category::class)->find($data['category']['id']);
+            if (!$category) {
+                return $this->json([
+                    'error' => 'Categoria "%s" no existe',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Validate price and stock
+        if (!is_numeric($data['price']) || $data['price'] < 0) {
+            return $this->json([
+                'error' => 'Valor invalido para precio del producto',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_numeric($data['stock']) || $data['stock'] < 0) {
+            return $this->json([
+                'error' => 'valor invalido para la cantidad del producto',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        // Actualizar las propiedades del producto con los nuevos valores
+        $product->setTitle($data['title']);
+        $product->setDescription($data['description']);
+        $product->setCode($data['code']);
+        $product->setPrice($data['price']);
+        $product->setStock($data['stock']);
+        $product->setStatus($data['status']);
+        $product->setCategory($category);
+        // Persistir los cambios en la base de datos
+        $entityManager->flush();
+        // Crear una respuesta JSON con el producto actualizado
+        return $this->json([
+            'message' => 'El producto se actualizo!! ',
+            'code' =>  $product->getCode()
         ], Response::HTTP_CREATED);
     }
 }
