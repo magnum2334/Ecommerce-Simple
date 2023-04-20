@@ -53,7 +53,7 @@ class ProductsController extends AbstractController
         }
 
         // Validate price and stock
-        if (!is_numeric($request->request->get('price')) ||$request->request->get('price') < 0) {
+        if (!is_numeric($request->request->get('price')) || $request->request->get('price') < 0) {
             return $this->json([
                 'error' => 'Valor invalido para precio del producto',
             ], Response::HTTP_BAD_REQUEST);
@@ -73,7 +73,17 @@ class ProductsController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
-
+        $photoFile = $request->files->get('photo');
+       
+        if ($photoFile) {
+            $photoFileName = uniqid() . '.' . $photoFile->guessExtension();
+            $photoFile->move(
+                $this->getParameter('products_photos'),
+                $photoFileName
+            );
+            $data['photo'] = $photoFileName;
+        }
+       
         $product = new Products();
         $product->setTitle($request->request->get('title'));
         $product->setDescription($request->request->get('description'));
@@ -81,6 +91,7 @@ class ProductsController extends AbstractController
         $product->setPrice($request->request->get('price'));
         $product->setStock($request->request->get('stock'));
         $product->setStatus($request->request->get('status'));
+        $product->setPhoto($photoFileName);
         if (isset($category)) {
             $product->setCategory($category);
         }
@@ -90,7 +101,6 @@ class ProductsController extends AbstractController
             'message' => 'El producto se creo!! ',
             'code' =>  $product->getCode()
         ], Response::HTTP_CREATED);
-        
     }
     #[Route('update/product', name: 'product_update',  methods: ['POST'])]
     public function update(Request $request, ManagerRegistry $doctrine): Response

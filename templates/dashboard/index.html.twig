@@ -88,7 +88,7 @@
 										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
 									<div class="modal-body">
-										<b-form @submit.prevent="submitFormProduct">
+										<b-form @submit.prevent="submitFormProduct" enctype="multipart/form-data">
 											<b-row>
 												<b-col sm="12" md="6">
 													<b-form-group id="title-input-group" label="Título" label-for="title-input">
