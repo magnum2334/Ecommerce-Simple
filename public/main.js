@@ -248,6 +248,7 @@ let app = new Vue({
                     stock: item.stock,
                     status: item.status ? "Activo" : "Inavilitado",
                     category: item.category,
+                    photo: item.photo,
                     actions: null
                 }))
             this.product.copy = [...this.product.productsActive]
@@ -425,7 +426,7 @@ let app = new Vue({
             }
         },
         inputChangesSearch() {
-            this.changesSearch = true
+            this.changesSearch = false
             setTimeout(() => {
                 if (this.searchInputProduct == '') {
                     this.product.productsActive = this.product.copy
@@ -434,11 +435,14 @@ let app = new Vue({
                     this.product.productsActive = this.product.productsActive.filter(product => {
                         const title = product.title.toLowerCase();
                         const description = product.description.toLowerCase();
-                        return title.includes(this.searchInputProduct.toLowerCase()) || description.includes(this.searchInputProduct.toLowerCase());
+                        const category = product.category.toLowerCase();
+                        
+                        return title.includes(this.searchInputProduct.toLowerCase()) || description.includes(this.searchInputProduct.toLowerCase()) || category.includes(this.searchInputProduct.toLowerCase);
                     });
                 }
+                this.changesSearch = true;
             }, 1000);
-            this.changesSearch = false
+            
         },
         async updateProduct(value) {
             let data = {

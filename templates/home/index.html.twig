@@ -78,7 +78,7 @@
 						<div v-if="isLoggin" class="dropdown">
 							<a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								<img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy">
-								
+
 							</a>
 							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
 								<li>
@@ -120,7 +120,9 @@
 				<div v-if="product.existProducts" class="row">
 					<div class="col-4 my-2" v-for="(product, index) in product.productsActive" :key="index">
 						<b-card>
-							<div class="card-img-top" style="background-image: url('https://mdbootstrap.com/img/new/standard/nature/023.jpg'); height: 200px;"></div>
+							<div class="card-img-top">
+								<b-img :src="'images/uploads/products_photos/' + product.photo " fluid alt="Responsive image"></b-img>
+							</div>
 							<b-card-body style="height:150px !important;">
 								<h5 class="card-title">
 									<strong>${product.title}</strong>
