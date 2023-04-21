@@ -2,6 +2,7 @@ let app = new Vue({
     el: '#app',
     delimiters: ['${', '}'],
     data: () => ({
+
         //show componets
         showProduct: true,
         showUsers: false,
@@ -51,7 +52,8 @@ let app = new Vue({
             productsActive: [],
             id: '',
             photo: '',
-            photoExists: false
+            photoNew: '',
+            photoExists: false,
 
         },
         customer: {
@@ -148,7 +150,6 @@ let app = new Vue({
             }
         },
         onFileChange(event) {
-            console.log(event)
             this.product.photo = event.target.files[0];
             this.product.photoExists = true;
         },
@@ -176,6 +177,13 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.product.title = '';
+                this.product.code = '';
+                this.product.description = '';
+                this.product.price = '';
+                this.product.stock = '';
+                this.product.category = '';
+                this.product.photo = null;
                 this.categories();
                 this.products();
             } catch (error) {
@@ -189,7 +197,6 @@ let app = new Vue({
                 });
             }
         },
-
         async submitFormCategory() {
             let data = {
                 name: this.category.name,
@@ -204,6 +211,7 @@ let app = new Vue({
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Aceptar'
                 });
+                this.category.name = '';
                 this.categories();
                 this.products();
 
@@ -432,7 +440,6 @@ let app = new Vue({
             }, 1000);
             this.changesSearch = false
         },
-
         async updateProduct(value) {
             let data = {
                 id: value.item.id,
@@ -496,12 +503,52 @@ let app = new Vue({
                 });
             }
         },
-        updateProductPhoto() {
-            
+        infoModalUpdatePhoto(route , id) {
+            this.product.photoNew = route
+            this.product.id = id;
         },
-        verfoto(code){
-            return 'Ver producto ' + code;
-        } 
-        
+        async updateProductPhoto() {
+            let formData = new FormData();
+            formData.append('id', this.product.id);
+            formData.append('photo', this.product.photo);
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/update/photo/product', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Producto actualizado ',
+                    text: `la foto correctamente exitosamente`,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+                this.product.photoNew = response.data.photo
+                this.product.photo = '';
+                this.product.photoExists = false;
+                this.categories();
+                this.products();
+            } catch (error) {
+                let errorMessage = error.response.data.error || 'Hubo un error al intentar actualizar el producto. Por favor, intenta de nuevo más tarde.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al actualizar el producto',
+                    text: errorMessage,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+          
+            this.product.photo = '';
+            this.product.photoExists = false;
+        },
+        onHideModal(){
+            this.product.photo = ''
+        },
+        onFileChangeUpdate(event){
+            this.product.photo = event.target.files[0];
+            this.product.photoExists = true;
+        }
     },
 })

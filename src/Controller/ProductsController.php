@@ -106,7 +106,7 @@ class ProductsController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $productsRepository = $entityManager->getRepository(Products::class);
-        $data = $request->request->all();
+        $data = json_decode($request->getContent(), true);
         // Buscar el producto por el código
         $product = $productsRepository->findOneBy(['id' => $data['id']]);
 
@@ -144,6 +144,37 @@ class ProductsController extends AbstractController
         return $this->json([
             'message' => 'El producto se actualizo!! ',
             'code' =>  $product->getCode()
+        ], Response::HTTP_CREATED);
+    }
+
+    #[Route('update/photo/product', name: 'product_photo_update',  methods: ['POST'])]
+    public function updatePhoto(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $productsRepository = $entityManager->getRepository(Products::class);
+        
+        // Buscar el producto por el código
+        $product = $productsRepository->findOneBy(['id' => $request->request->get('id')]);
+        if (!$product) {
+            return $this->json([
+                'error' => 'El producto no existe'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        $photoFile = $request->files->get('photo');
+        if ($photoFile) {
+            $photoFileName = uniqid() . '.' . $photoFile->guessExtension();
+            $photoFile->move(
+                $this->getParameter('products_photos'),
+                $photoFileName
+            );
+        }
+        $product->setPhoto($photoFileName);
+        // Persistir los cambios en la base de datos
+        $entityManager->flush();
+        // Crear una respuesta JSON con el producto actualizado
+        return $this->json([
+            'message' => 'El producto se actualizo!! ',
+            'photo' =>  $product->getPhoto()
         ], Response::HTTP_CREATED);
     }
 }
