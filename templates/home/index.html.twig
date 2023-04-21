@@ -118,10 +118,10 @@
 					</div>
 				</div>
 				<div v-if="product.existProducts" class="row">
-					<div class="col-4 my-2" v-for="(product, index) in product.productsActive" :key="index">
+					<div class="col-12 col-lg-4  my-2" v-for="(product, index) in product.productsActive" :key="index">
 						<b-card>
 							<div class="card-img-top">
-								<b-img :src="'images/uploads/products_photos/' + product.photo " fluid alt="Responsive image"></b-img>
+								<b-img style=" min-with:'400px'; min-height:'400px';	" :src="'images/uploads/products_photos/' + product.photo " fluid alt="Responsive image"></b-img>
 							</div>
 							<b-card-body style="height:150px !important;">
 								<h5 class="card-title">

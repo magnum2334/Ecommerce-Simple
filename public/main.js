@@ -431,13 +431,11 @@ let app = new Vue({
                 if (this.searchInputProduct == '') {
                     this.product.productsActive = this.product.copy
                 } else {
-                    console.log(this.product.productsActive)
                     this.product.productsActive = this.product.productsActive.filter(product => {
                         const title = product.title.toLowerCase();
                         const description = product.description.toLowerCase();
-                        const category = product.category.toLowerCase();
-                        
-                        return title.includes(this.searchInputProduct.toLowerCase()) || description.includes(this.searchInputProduct.toLowerCase()) || category.includes(this.searchInputProduct.toLowerCase);
+                        const category = product.category.name.toLowerCase();
+                        return title.includes(this.searchInputProduct.toLowerCase()) || description.includes(this.searchInputProduct.toLowerCase()) || category.includes(this.searchInputProduct.toLowerCase());
                     });
                 }
                 this.changesSearch = true;
