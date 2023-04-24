@@ -120,12 +120,12 @@ class ProductsController extends AbstractController
             }
         }
         // Validate price and stock
-        if (!is_numeric($data['price']) || $data['price'] < 0) {
+        if (!is_numeric($data['price']) || $data['price'] <= 0) {
             return $this->json([
                 'error' => 'Valor invalido para precio del producto',
             ], Response::HTTP_BAD_REQUEST);
         }
-        if (!is_numeric($data['stock']) || $data['stock'] < 0) {
+        if (!is_numeric($data['stock']) || $data['stock'] <= 0) {
             return $this->json([
                 'error' => 'valor invalido para la cantidad del producto',
             ], Response::HTTP_BAD_REQUEST);

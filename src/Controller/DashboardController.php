@@ -23,6 +23,7 @@ class DashboardController extends AbstractController
         return $this->render('dashboard/index.html.twig', [
             'controller_name' => 'DashboardController',
         ]);
+        
     }
     #[Route('/categories', name: 'app_categories', methods: ['GET'])]
     public function getCategories(ManagerRegistry $doctrine): JsonResponse

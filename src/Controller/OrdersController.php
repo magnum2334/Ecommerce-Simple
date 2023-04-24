@@ -16,6 +16,7 @@ use App\Entity\Products;
 
 class OrdersController extends AbstractController
 {
+   
     #[Route('/create/order', name: 'app_create_order', methods: ['POST'])]
     public function createOrder(Request $request, ManagerRegistry $doctrine): JsonResponse
     {
@@ -24,6 +25,7 @@ class OrdersController extends AbstractController
         $customer = $doctrine->getRepository(Customer::class)->find($data['customer_id']);
         $order = new Order();
         $order->setCustomer($customer);
+        $order->setTotalPrice($data['total_price']);
         $order->setOrderDate(\DateTime::createFromFormat('Y-m-d', $data['order_date']));
 
 
@@ -74,9 +76,6 @@ class OrdersController extends AbstractController
            
            
             if ($product->getStock() <  $quantity) {
-                // $product->setStock(0);
-                // $product->setStatus(false);
-                // $entityManager->flush();
                 return new JsonResponse([
                     'message' => 'el producto' . $product->getTitle() . ' no tiene suficientes stocks en el inventario para la compra',
                 ], Response::HTTP_BAD_REQUEST);

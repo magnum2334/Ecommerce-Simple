@@ -22,6 +22,9 @@ class Order
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $order_date = null;
 
+    #[ORM\Column(length: 400)]
+    private ?string $totalPrice = null;
+
     
 
     public function getId(): ?int
@@ -49,6 +52,18 @@ class Order
     public function setOrderDate(\DateTimeInterface $order_date): self
     {
         $this->order_date = $order_date;
+
+        return $this;
+    }
+
+    public function getTotalPrice(): ?string
+    {
+        return $this->totalPrice;
+    }
+
+    public function setTotalPrice(string $totalPrice): self
+    {
+        $this->totalPrice = $totalPrice;
 
         return $this;
     }

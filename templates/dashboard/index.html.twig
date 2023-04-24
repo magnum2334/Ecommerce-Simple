@@ -5,7 +5,102 @@
 
 
 {% block body %}
-<style></style>
+<style>
+	.lds-spinner {
+		color: official;
+		display: inline-block;
+		position: relative;
+		width: 80px;
+		height: 80px;
+	}
+
+	.lds-spinner div {
+		transform-origin: 40px 40px;
+		animation: lds-spinner 1.2s linear infinite;
+	}
+
+	.lds-spinner div:after {
+		content: " ";
+		display: block;
+		position: absolute;
+		top: 3px;
+		left: 37px;
+		width: 6px;
+		height: 18px;
+		border-radius: 20%;
+		background: #fff;
+	}
+
+	.lds-spinner div:nth-child(1) {
+		transform: rotate(0deg);
+		animation-delay: -1.1s;
+	}
+
+	.lds-spinner div:nth-child(2) {
+		transform: rotate(30deg);
+		animation-delay: -1s;
+	}
+
+	.lds-spinner div:nth-child(3) {
+		transform: rotate(60deg);
+		animation-delay: -0.9s;
+	}
+
+	.lds-spinner div:nth-child(4) {
+		transform: rotate(90deg);
+		animation-delay: -0.8s;
+	}
+
+	.lds-spinner div:nth-child(5) {
+		transform: rotate(120deg);
+		animation-delay: -0.7s;
+	}
+
+	.lds-spinner div:nth-child(6) {
+		transform: rotate(150deg);
+		animation-delay: -0.6s;
+	}
+
+	.lds-spinner div:nth-child(7) {
+		transform: rotate(180deg);
+		animation-delay: -0.5s;
+	}
+
+	.lds-spinner div:nth-child(8) {
+		transform: rotate(210deg);
+		animation-delay: -0.4s;
+	}
+
+	.lds-spinner div:nth-child(9) {
+		transform: rotate(240deg);
+		animation-delay: -0.3s;
+	}
+
+	.lds-spinner div:nth-child(10) {
+		transform: rotate(270deg);
+		animation-delay: -0.2s;
+	}
+
+	.lds-spinner div:nth-child(11) {
+		transform: rotate(300deg);
+		animation-delay: -0.1s;
+	}
+
+	.lds-spinner div:nth-child(12) {
+		transform: rotate(330deg);
+		animation-delay: 0s;
+	}
+
+	@keyframes lds-spinner {
+		0% {
+			opacity: 1;
+		}
+
+		100% {
+			opacity: 0;
+		}
+	}
+</style>
 <!--Main Navigation-->
 <header>
 	<!-- Sidebar -->
@@ -59,10 +154,12 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="col py-3">
 				<div class="text-center">
 					<h2 class="mb-0 text-center">Dashboard Ecommerce
 						<i class="fas fa-tachometer-alt"></i>
+
 					</h2><br>
 				</div>
 				<div v-if="showProduct">
@@ -71,7 +168,7 @@
 							<i class="fas fa-shopping-cart mr-2"></i>
 						</h5><br>
 						<div class="d-flex justify-content-between align-items-center mb-4">
-							<button type="button"  class="btn btn-success btn-lg py-1 border-none px-4"
+							<button type="button" class="btn btn-success btn-lg py-1 border-none px-4"
 								data-bs-toggle="modal" data-bs-target="#modalCreateProduct">
 								<i class="fas fa-plus me-2"></i>Añadir producto
 							</button>
@@ -245,11 +342,11 @@
 									<div class="modal-body">
 										<div class="d-flex justify-content-center">
 											<input @change="onFileChange" type="file" class="form-control-file"
-												id="image" accept="image/jpeg, image/png, image/gif"
-												>
+												id="image" accept="image/jpeg, image/png, image/gif">
 										</div>
 										<div>
-											<b-button @click="updateProductPhoto" v-if="product.photoExists"  class="rounded-circle">
+											<b-button @click="updateProductPhoto" v-if="product.photoExists"
+												class="rounded-circle">
 												<i class="fas fa-edit"></i>
 											</b-button>
 										</div>
@@ -272,63 +369,69 @@
 						</div>
 
 					</div>
+					<div class="text-center" v-if="!spinnerProduct"><b-spinner class="m-5" size="lg"
+							label="Busy"></b-spinner></div>
 					<!-- <pre>	<code>${product.products}</code></pre> -->
-					<b-table striped hover :items="product.products" :filter="productAdminFilter"
-						:fields="product.fields" id="products" :per-page="product.perPage"
-						:current-page="product.currentPage">
-						<template #cell(category)="row">
-							${row.item.category.name}
-						</template>
-						<template #cell(title)="row">
-							<input v-model="row.item.title" class="form-control" style="text-align: center;">
-						</template>
-						<template #cell(description)="row">
-							<textarea v-model="row.item.description" class="form-control"
-								style="text-align: center;"></textarea>
-						</template>
-						<template #cell(code)="row">
-							<input v-model="row.item.code" class="form-control" style="text-align: center;">
-						</template>
-						<template #cell(price)="row">
-							<input v-model="row.item.price" type="number" min="1" class="form-control"
-								style="text-align: center;">
-						</template>
-						<template #cell(stock)="row">
-							<input v-model="row.item.stock" type="number" min="1" class="form-control"
-								style="text-align: center;">
-						</template>
-						<template #cell(category)="row">
-							<b-form-group clas id="category-input-group" label-for="category-input">
-								<b-form-select class="form-select" id="category-input" v-model="row.item.category.id"
-									:options="product.categories" value="id" class="form-select-lg" />
-							</b-form-group>
-						</template>
-						<template #cell(status)="row">
-							<input v-model="row.item.status" class="form-check-input" type="checkbox" value=""
-								id="flexCheckDefault">
-							<label class="form-check-label" for="flexCheckDefault">
-								${(row.item.status) ? 'Activo': 'Inactivo'}
-							</label>
-						</template>
-						<template #cell(photo)="row">
-							<button v-b-tooltip.hover.bottom="'Ver producto ' + row.item.title"
-								@click="infoModalUpdatePhoto(row.item.photo , row.item.id)" variant="info"
-								class="rounded-circle" type="button"
-								class="btn btn-success btn-lg py-1 border-none px-4" data-bs-toggle="modal"
-								data-bs-target="#modalViewPhotoProduc">
-								<i class="fa-solid fa-eye"></i>
-							</button>
-						</template>
-						<template #cell(actions)="row">
-							<button @click="updateProduct(row)" class="btn btn-sm btn-warning">
-								<i class="fas fa-edit"></i>
-								Editar
-							</button>
-						</template>
-					</b-table>
-					<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts"
-						:per-page="product.perPage" aria-controls="products"></b-pagination>
+					<div v-if="spinnerProduct">
+						<b-table striped hover :items="product.products" :filter="productAdminFilter"
+							:fields="product.fields" id="products" :per-page="product.perPage"
+							:current-page="product.currentPage">
+							<template #cell(category)="row">
+								${row.item.category.name}
+							</template>
+							<template #cell(title)="row">
+								<input v-model="row.item.title" class="form-control" style="text-align: center;">
+							</template>
+							<template #cell(description)="row">
+								<textarea v-model="row.item.description" class="form-control"
+									style="text-align: center;"></textarea>
+							</template>
+							<template #cell(code)="row">
+								<input v-model="row.item.code" class="form-control" style="text-align: center;">
+							</template>
+							<template #cell(price)="row">
+								<input v-model="row.item.price" type="number" min="1" class="form-control"
+									style="text-align: center;">
+							</template>
+							<template #cell(stock)="row">
+								<input v-model="row.item.stock" type="number" min="1" class="form-control"
+									style="text-align: center;">
+							</template>
+							<template #cell(category)="row">
+								<b-form-group clas id="category-input-group" label-for="category-input">
+									<b-form-select class="form-select" id="category-input"
+										v-model="row.item.category.id" :options="product.categories" value="id"
+										class="form-select-lg" />
+								</b-form-group>
+							</template>
+							<template #cell(status)="row">
+								<input v-model="row.item.status" class="form-check-input" type="checkbox" value=""
+									id="flexCheckDefault">
+								<label class="form-check-label" for="flexCheckDefault">
+									${(row.item.status) ? 'Activo': 'Inactivo'}
+								</label>
+							</template>
+							<template #cell(photo)="row">
+								<button v-b-tooltip.hover.bottom="'Ver producto ' + row.item.title"
+									@click="infoModalUpdatePhoto(row.item.photo , row.item.id)" variant="info"
+									class="rounded-circle" type="button"
+									class="btn btn-success btn-lg py-1 border-none px-4" data-bs-toggle="modal"
+									data-bs-target="#modalViewPhotoProduc">
+									<i class="fa-solid fa-eye"></i>
+								</button>
+							</template>
+							<template #cell(actions)="row">
+								<button @click="updateProduct(row)" class="btn btn-sm btn-warning">
+									<i class="fas fa-edit"></i>
+									Editar
+								</button>
+							</template>
+						</b-table>
+						<b-pagination v-model="product.currentPage" :total-rows="rowsTableProducts"
+							:per-page="product.perPage" aria-controls="products">
+						</b-pagination>
 
+					</div>
 				</div>
 				<div v-if="showUsers">
 					<div class="text-center">
@@ -364,7 +467,7 @@
 						<template #cell(products)="row">
 							<ul>
 								<li v-for="product in row.item.products">
-									<strong>Nombre:</strong>${product.productName},
+									<strong>Nombre:</strong>${product.productName}
 									<br>
 									<strong>Cantidad</strong>:${product.quantity}
 									<br>

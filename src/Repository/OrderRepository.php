@@ -29,7 +29,7 @@ class OrderRepository extends ServiceEntityRepository
     public function getOrderDetails(): ?array
     {
         $qb = $this->createQueryBuilder('o')
-            ->select('od.unitPrice, od.quantity, o.id AS orden_id, cu.fullname, cu.email , po.code , po.id AS product_id, o.order_date')
+            ->select('od.unitPrice, od.quantity, o.id AS orden_id, cu.fullname, cu.email , po.title , po.id AS product_id, o.order_date', 'o.totalPrice AS total', 'po.price')
             ->join(OrderDetail::class, 'od', 'WITH', 'od.orden = o.id')
             ->join(Customer::class, 'cu', 'WITH', 'cu.id = od.customer')
             ->join(Products::class, 'po', 'WITH', 'po.id = od.product')

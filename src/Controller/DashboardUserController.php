@@ -38,7 +38,6 @@ class DashboardUserController extends AbstractController
     public function auth(Request $request, ManagerRegistry $doctrine): Response
     {
         $data = json_decode($request->getContent(), true);
-
         $entityManager = $doctrine->getManager();
         $userRepository = $entityManager->getRepository(Customer::class);
         $user = $userRepository->findOneBy(['email' => $data['email']]);

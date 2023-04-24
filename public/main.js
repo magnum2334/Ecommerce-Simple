@@ -16,6 +16,7 @@ let app = new Vue({
         ordenesFilter: '',
         //cart
         cart: [],
+        totalpriceCart: '',
         cartFilter: '',
         cardSelect: false,
         // orders for customers
@@ -33,6 +34,7 @@ let app = new Vue({
             copy: [],
             categoryFilter: ''
         },
+        spinnerProduct: true,
         product: {
             title: '',
             description: '',
@@ -42,7 +44,7 @@ let app = new Vue({
             status: null,
             category: null,
             fields: ['title', 'description', 'code', 'price', 'stock', 'category', 'status', 'photo', 'actions'],
-            fieldsOrder: ['title', 'description', 'price', 'category'],
+            fieldsOrder: ['title', 'description', 'price', 'quantity', 'total', 'category'],
             products: [],
             perPage: 5,
             currentPage: 1,
@@ -92,6 +94,37 @@ let app = new Vue({
         this.products()
         this.customers()
         this.orders()
+        // let user = JSON.parse(localStorage.getItem('user'))
+        // if(localStorage.getItem('user') != []){
+        //     let email = user.email
+        //     console.log(email)
+        //     const orders = await axios.get('http://localhost:8000/orders')
+
+        //     const dara = Object.values(orders.data.reduce((acc, item) => {
+        //         if (!acc[item.orden_id]) {
+        //             acc[item.orden_id] = {
+        //                 orden_id: item.orden_id,
+        //                 customerName: item.fullname,
+        //                 customerEmail: item.email,
+        //                 orderDate: new Date().toISOString().split('T')[0], // Set to today's date
+        //                 products: [],
+        //                 total: item.total,
+        //             };
+        //         }
+
+        //         acc[item.orden_id].products.push({
+        //             productId: item.product_id,
+        //             productName: item.title,
+        //             quantity: item.quantity,
+        //             price: JSON.stringify(item.price)  + ',000'
+        //         });
+
+        //         return acc;
+        //     }, {}));
+        //     console.log()
+        //     this.order.orders = dara;
+
+        // }
     },
     mounted() {
 
@@ -125,7 +158,6 @@ let app = new Vue({
             return this.product.categories.length
         }
     },
-
     methods: {
         hideText(typ) {
             if (typ == 'Productos') {
@@ -178,22 +210,28 @@ let app = new Vue({
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Producto creado exitosamente',
-                    text: `El producto con código ${response.data.code} ha sido creado con éxito.`,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Aceptar'
-                });
-                this.product.title = '';
-                this.product.code = '';
-                this.product.description = '';
-                this.product.price = '';
-                this.product.stock = '';
-                this.product.category = '';
-                this.product.photo = null;
-                this.categories();
-                this.products();
+                this.spinnerProduct = false;
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Producto creado exitosamente',
+                        text: `El producto con código ${response.data.code} ha sido creado con éxito.`,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    
+                    this.product.title = '';
+                    this.product.code = '';
+                    this.product.description = '';
+                    this.product.price = '';
+                    this.product.stock = '';
+                    this.product.category = '';
+                    this.product.photo = null;
+                    this.categories();
+                    this.products();
+       
+                    this.spinnerProduct = true;
+                }, 4000);
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar crear el producto. Por favor, intenta de nuevo más tarde.';
                 Swal.fire({
@@ -276,22 +314,20 @@ let app = new Vue({
                         customerEmail: item.email,
                         orderDate: new Date().toISOString().split('T')[0], // Set to today's date
                         products: [],
-                        total: 0,
-                        status: 'Pending'
+                        total: item.total,
                     };
                 }
 
                 acc[item.orden_id].products.push({
                     productId: item.product_id,
-                    productName: item.code,
+                    productName: item.title,
                     quantity: item.quantity,
-                    price: item.unitPrice
+                    price: JSON.stringify(item.price)  + ',000'
                 });
-
-                acc[item.orden_id].total += item.unitPrice * item.quantity;
 
                 return acc;
             }, {}));
+            
             this.order.orders = dara;
         },
         async submitFormCustomer() {
@@ -339,7 +375,7 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
                 if (this.customer.emailLogin == 'admin@admin.com' && this.customer.passwordLogin == 'error404') {
-                    window.location.href = 'http://127.0.0.1:8000/dashboard'
+                    window.location.href = 'http://127.0.0.1:8000/dashboard/'
                 } else {
                     this.isLoggin = true
                     this.customer.customer_id = response.data.user.id
@@ -348,7 +384,7 @@ let app = new Vue({
                     localStorage.setItem('user', JSON.stringify(response.data.user))
                     setTimeout(() => {
                         window.location.href = 'http://127.0.0.1:8000/'
-                    }, 2000);
+                    }, 1000);
                 }
             } catch (error) {
                 let errorMessage = error.response.data.error || 'Hubo un error al intentar Ingresar, intenta de nuevo más tarde.';
@@ -362,13 +398,13 @@ let app = new Vue({
             }
         },
         addToCart() {
-           
+
         },
         SelectProduct(product) {
-            console.log(product)
             this.product.select = ''
             this.product.select = product
             this.product.select = {
+                product_id: product.id,
                 title: product.title,
                 description: product.description,
                 code: product.code,
@@ -394,25 +430,21 @@ let app = new Vue({
                 });
             } else {
                 try {
+                    this.cart = this.cart.map(item => {
+                        return {
+                            product_id: item.product_id,
+                            quantity: item.selected,
+                        };
+                    });
                     const order = {
                         customer_id: this.customer.customer_id = JSON.parse(localStorage.getItem('customer')),
                         order_date: new Date().toISOString().slice(0, 10),
-                        order_details: []
+                        order_details: this.cart,
+                        total_price: this.totalpriceCart
                     };
-                    this.cart.forEach((product) => {
-                        const existingProductIndex = order.order_details.findIndex((orderProduct) => orderProduct.product_id === product.id);
-                        if (existingProductIndex !== -1) {
-                            order.order_details[existingProductIndex].quantity += 1;
-                        } else {
-                            order.order_details.push({
-                                product_id: product.id,
-                                quantity: 1
-                            });
-                        }
-                    });
 
                     const response = await axios.post('http://localhost:8000/create/order', order);
-                    if (response.data.message === 'The order was successfully created') {
+                    if (response.data.message === 'La orden ha sido creada exitosamente' ||response.data.message ===  'The order was successfully created') {
                         // SweetAlert para orden creada con éxito
                         Swal.fire({
                             title: '¡Orden creada!',
@@ -454,7 +486,7 @@ let app = new Vue({
                     });
                 }
                 this.changesSearch = true;
-            }, 1000);
+            }, 500);
 
         },
         async updateProduct(value) {
@@ -579,20 +611,87 @@ let app = new Vue({
                 this.product.select.selected = 1;
             }
         },
-        handleOk () {
-            this.cart.push(this.product.select)
+        handleOk() {
+            const index = this.cart.findIndex(item => item.title === this.product.select.title);
+            if (index >= 0) {
+                const item = this.cart[index];
+                if (item.selected == item.stock) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No se al agregar al carrito',
+                        text: 'No se puede agregar el producto al carrito no existen stock',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+                if (item.selected < item.stock) {
+
+                    if (item.selected + this.product.select.selected > item.stock) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Error al agregar al carrito',
+                            text: 'No se puede agregar el producto al carrito no existen sufiencientes stock',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        item.selected = item.selected + this.product.select.selected;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se agrego al carrito',
+                            text: "Se agrega correctamente el producto al carrito",
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Aceptar'
+                        });
+
+                    }
+
+                }
+
+            } else {
+                this.cart.push(this.product.select);
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se agrego al carrito',
+                        text: "Se agrega correctamente el producto al carrito",
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }, 500);
+            }
             this.$nextTick(() => {
-              this.$bvModal.hide('modal-prevent-closing')
+                this.$bvModal.hide('modal-prevent-closing')
             })
             localStorage.setItem('cart', JSON.stringify(this.cart))
-            Swal.fire({
-                icon: 'success',
-                title: 'Se agrego al carrito',
-                text: "Se agrega correctamente el producto al carrito",
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar'
-            });
-          }
+
+        },
+        totalPrice(price, quantity) {
+            const numericPrice = parseFloat(price.replace(/[$,.]/g, ''));
+            const total = numericPrice * quantity;
+            const formattedTotal = '$' + total.toLocaleString();
+            console.log(formattedTotal);
+            return formattedTotal;
+        },
+        footRowClass(rowData, rowIndex) {
+            if (rowIndex === this.cart.length) {
+                return 'd-none';
+            }
+        },
+        totalCart() {
+
+            const total = this.cart.reduce((acc, item) => {
+                const numericPrice = parseFloat(item.price.replace(/[$,.]/g, ''));
+                return acc + numericPrice * item.selected;
+            }, 0);
+            this.totalpriceCart = '$' + total.toLocaleString();
+            return '$' + total.toLocaleString();
+
+        },
+        cerrar(){
+            window.location.reload ()
+            localStorage.clear()
+        }
 
     },
 })
