@@ -7,174 +7,224 @@
 {% block body %}
 
 
-	<style>
-		.search-container {
-			position: relative;
-		}
+<style>
+	.search-container {
+		position: relative;
+	}
 
-		.input-container {
-			display: flex;
-			align-items: center;
-			position: relative;
-		}
+	.input-container {
+		display: flex;
+		align-items: center;
+		position: relative;
+	}
 
-		.input-container input {
-			padding-left: 30px;
-		}
+	.input-container input {
+		padding-left: 30px;
+	}
 
-		.input-container i {
-			position: absolute;
-			left: 10px;
-			color: #999;
-		}
+	.input-container i {
+		position: absolute;
+		left: 10px;
+		color: #999;
+	}
 
-		.input-line {
-			position: absolute;
-			bottom: 0;
-			left: 0;
-			width: 0;
-			height: 2px;
-			background-color: #333;
-			transition: width 0.2s ease;
-		}
+	.input-line {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 0;
+		height: 2px;
+		background-color: #333;
+		transition: width 0.2s ease;
+	}
 
-		.input-container input:focus~.input-line {
-			width: 100%;
-		}
+	.input-container input:focus~.input-line {
+		width: 100%;
+	}
 
-		.input-container input:not(:placeholder-shown)~i {
-			display: none;
-		}
-	</style>
-	<div>
-		<!-- Navbar -->
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<div class="container-fluid">
-				<a class="navbar-brand text-primary" href="#">
-					Home Elements
-				</a>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarSupportedContent">
-					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-						<li class="nav-item">
-							<a class="nav-link" href="/">Home</a>
-						</li>
-						<li v-if="!isLoggin" class="nav-item">
-							<a class="nav-link" href="/register">Registar</a>
-						</li>
-						<li v-if="!isLoggin" class="nav-item">
-							<a class="nav-link" href="/login">Login</a>
-						</li>
-					</ul>
-					<div class="d-flex align-items-center">
-						<a v-if="isLoggin" class="text-reset me-3">
-							${customer.user.fullname}
+	.input-container input:not(:placeholder-shown)~i {
+		display: none;
+	}
+</style>
+<div>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<div class="container-fluid">
+			<a class="navbar-brand text-primary" href="#">
+				Home Elements
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li v-if="!isLoggin" class="nav-item">
+						<a class="nav-link" href="/">Home</a>
+					</li>
+					<li v-if="!isLoggin" class="nav-item">
+						<a class="nav-link" href="/register">Registar</a>
+					</li>
+					<li v-if="!isLoggin" class="nav-item">
+						<a class="nav-link" href="/login">Login</a>
+					</li>
+				</ul>
+				<div class="d-flex align-items-center">
+					<a v-if="isLoggin" class="text-reset me-3">
+						${customer.user.fullname}
+					</a>
+					<a class="text-reset me-3" @click="cardFuction('cart')">
+						<i class="fas fa-shopping-cart"></i>
+					</a>
+					<div v-if="isLoggin" class="dropdown">
+						<a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
+							id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle"
+								height="25" alt="Black and White Portrait of a Man" loading="lazy">
+
 						</a>
-						<a class="text-reset me-3" @click="cardFuction('cart')">
-							<i class="fas fa-shopping-cart"></i>
-						</a>
-						<div v-if="isLoggin" class="dropdown">
-							<a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								<img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy">
-
-							</a>
-							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
-								<li>
-									<a class="dropdown-item" :href="linkCustomer">Mis ordenes</a>
-								</li>
-								<li>
-									<a class="dropdown-item" href="#">Logout</a>
-								</li>
-							</ul>
-						</div>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+							<li>
+								<a class="dropdown-item" :href="linkCustomer">Mis ordenes</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#">Logout</a>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
-		</nav>
-		<!-- Navbar -->
-		<div
-			class="container">
-			<!--Section: Content-->
-			<section v-if="!cardSelect" class="text-center">
-				<h4 class="mb-5">
-					<strong>Productos</strong>
-				</h4>
+		</div>
+	</nav>
+	<!-- Navbar -->
+	<div class="container">
+		<!--Section: Content-->
+		<section v-if="!cardSelect" class="text-center">
+			<h4 class="mb-5">
+				<strong>Productos</strong>
+			</h4>
 
-				<div v-if="!product.existProducts" class="row">
-					<div v-for="n in 12" :key="n" class="col-lg-4 col-md-12 mb-4">
-						<b-card>
-							<b-skeleton-img class="w-100 h-100"></b-skeleton-img>
-						</b-card>
-					</div>
+			<div v-if="!product.existProducts" class="row">
+				<div v-for="n in 12" :key="n" class="col-lg-4 col-md-12 mb-4">
+					<b-card>
+						<b-skeleton-img class="w-100 h-100"></b-skeleton-img>
+					</b-card>
 				</div>
-				<div v-if="product.existProducts" class="search-container">
-					<div class="form">
-						<span id="input-group">
-							<input placeholder="Buscar Producto..." v-model="searchInputProduct" @input="inputChangesSearch" class="input" type="text" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 2px 2px 5px #ccc; font-size: 16px;"/>
-							<i v-if="changesSearch" class="fas fa-search" style="position: relative; right: 30px;"></i>
-						</span>
-					</div>
+			</div>
+			<div v-if="product.existProducts" class="search-container">
+				<div class="form">
+					<span id="input-group">
+						<input placeholder="Buscar Producto..." v-model="searchInputProduct" @input="inputChangesSearch"
+							class="input" type="text"
+							style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 2px 2px 5px #ccc; font-size: 16px;" />
+						<i v-if="changesSearch" class="fas fa-search" style="position: relative; right: 30px;"></i>
+					</span>
 				</div>
-				<div v-if="product.existProducts" class="row">
-					<div class="col-12 col-lg-4  my-2" v-for="(product, index) in product.productsActive" :key="index">
-						<b-card>
-							<div class="card-img-top">
-								<b-img style=" min-with:'400px'; min-height:'400px';	" :src="'images/uploads/products_photos/' + product.photo " fluid alt="Responsive image"></b-img>
-							</div>
-							<b-card-body style="height:150px !important;">
-								<h5 class="card-title">
-									<strong>${product.title}</strong>
-								</h5>
-								<p v-b-tooltip.hover.bottom="product.description" class="card-text" style="height:70px !important;">${cortarTexto(product.description)}
-								</p>
-							</b-card-body>
-							<b-card-footer>
-								<div class="d-flex justify-content-between ">
-									<div>
-										<span class="text-muted">
-											<strong>${product.category.name}</strong>
-										</span>
-										<br>
-										<span class="text-muted">${product.price}</span>
-									</div>
-									<b-button class="btn-sm" variant="primary" size="sm" @click="addToCart(product)">
-										Añadir</b-button>
+			</div>
+			<div v-if="product.existProducts" class="row">
+				<div class="col-12 col-lg-4  my-2" v-for="(product, index) in product.productsActive" :key="index">
+					<b-card>
+						<div class="card-img-top">
+							<b-img style=" min-height:'400px'!important;	"
+								:src="'images/uploads/products_photos/' + product.photo " fluid
+								alt="Responsive image"></b-img>
+						</div>
+						<b-card-body style="height:150px !important;">
+							<h5 class="card-title">
+								<strong>${product.title}</strong>
+							</h5>
+							<p v-b-tooltip.hover.bottom="product.description" class="card-text"
+								style="height:70px !important;">${cortarTexto(product.description)}
+							</p>
+						</b-card-body>
+						<b-card-footer>
+							<div class="d-flex justify-content-between ">
+								<div>
+									<span class="text-muted">
+										<strong>${product.category.name}</strong>
+									</span>
+									<br>
+									<span class="text-muted">${product.price}</span>
 								</div>
-							</b-card-footer>
-
-						</b-card>
-					</div>
-				</div>
-			</section>
-			<section v-if="cardSelect">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="text-center">
-							<div class="mb-0 text-center">
-								<h5 class="mb-0 ">
-									<strong>My Cart</strong>
-								</h5><br>
-								<button class="btn btn-success my-2" @click="payload(cart)">
-									comprar
-									<i class="fas fa-shopping-cart mr-2"></i>
-								</button>
+								<b-button v-b-modal.modal-lg class="btn-sm" variant="primary" size="sm"
+									@click="SelectProduct(product)">Añadir
+								</b-button>
 							</div>
-							<div class="form-control py-2">
-								<label>
-									<strong>Buscar...</strong>
-								</label>
-								<input class="form-control" v-model="cartFilter">
+						</b-card-footer>
+					</b-card>
+				</div>
+			</div>
+		</section>
+		<section>
+			<b-modal  @ok="handleOk" id="modal-lg" centered title="producto seleccionado">
+				<b-card>
+					<div class="card-img-top text-center">
+						<b-img style="height: 150px;
+              				transition: transform 0.2s ease-in-out;" :src="'images/uploads/products_photos/' + product.select.photo"
+							fluid alt="Responsive image" >
+						</b-img>
+					</div>
+					<b-card-body>
+						<h5 class="card-title text-center">
+							<h4><strong>${product.select.category}</strong>: <strong>${product.select.title}</strong>
+							</h4>
+							<br>
+							<p>
+								${product.select.description}
+							</p>
+							<br>
+						</h5>
+						<div class="row text-center">
+							<div class="col-sm-4">
+								<button id="subtract-btn" class="btn btn-danger" @click="decreaseProduct">-</button>
+							</div>
+							<div class="col-sm-4">
+								<strong><h4 id="counter">${product.select.selected}</h4></strong>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-btn" class="btn btn-success" @click="increaseProduct">+</button>
 							</div>
 						</div>
-						<b-table striped hover :items="cart" :filter="cartFilter" :fields="product.fieldsOrder">
-							<template #cell(category)="row">
-								${row.item.category.name}
-							</template>
-						</b-table>
+					</b-card-body>
+					<b-card-footer>
+						<div class="d-flex justify-content-between ">
+							<div>
+								<br>
+								<span class="text-muted">${product.select.price}</span>
+							</div>
+						</div>
+					</b-card-footer>
+				</b-card>
+			</b-modal>
+		</section>
+		<section v-if="cardSelect">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="text-center">
+						<div class="mb-0 text-center">
+							<h5 class="mb-0 ">
+								<strong>My Cart</strong>
+							</h5><br>
+							<button class="btn btn-success my-2" @click="payload(cart)">
+								comprar
+								<i class="fas fa-shopping-cart mr-2"></i>
+							</button>
+						</div>
+						<div class="form-control py-2">
+							<label>
+								<strong>Buscar...</strong>
+							</label>
+							<input class="form-control" v-model="cartFilter">
+						</div>
 					</div>
+					<b-table striped hover :items="cart" :filter="cartFilter" :fields="product.fieldsOrder">
+						<template #cell(category)="row">
+							${row.item.category.name}
+						</template>
+					</b-table>
 				</div>
-			</section>
-		</div>
+			</div>
+		</section>
+	</div>
 	{% endblock %}

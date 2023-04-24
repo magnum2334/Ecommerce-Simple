@@ -24,7 +24,7 @@ let app = new Vue({
         isLoggin: false,
         linkCustomer: '',
         searchInputProduct: '',
-        changesSearch: false,
+        changesSearch: true,
         category: {
             name: '',
             fields: ['name', 'actions'],
@@ -54,7 +54,15 @@ let app = new Vue({
             photo: '',
             photoNew: '',
             photoExists: false,
-
+            select: {
+                title: '',
+                description: '',
+                code: '',
+                price: null,
+                stock: null,
+                category: null,
+                selected: 1
+            }
         },
         customer: {
             fields: ['fullname', 'email', 'status'],
@@ -353,16 +361,23 @@ let app = new Vue({
                 });
             }
         },
-        addToCart(productId) {
-            this.cart.push(productId)
-            localStorage.setItem('cart', JSON.stringify(this.cart))
-            Swal.fire({
-                icon: 'success',
-                title: 'Se agrego al carrito',
-                text: "Se agrega correctamente el producto al carrito",
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar'
-            });
+        addToCart() {
+           
+        },
+        SelectProduct(product) {
+            console.log(product)
+            this.product.select = ''
+            this.product.select = product
+            this.product.select = {
+                title: product.title,
+                description: product.description,
+                code: product.code,
+                price: product.price,
+                stock: product.stock,
+                category: product.category.name,
+                photo: product.photo,
+                selected: 1
+            }
         },
         async payload(card) {
             if (this.cart.length === 0) {
@@ -440,7 +455,7 @@ let app = new Vue({
                 }
                 this.changesSearch = true;
             }, 1000);
-            
+
         },
         async updateProduct(value) {
             let data = {
@@ -505,7 +520,7 @@ let app = new Vue({
                 });
             }
         },
-        infoModalUpdatePhoto(route , id) {
+        infoModalUpdatePhoto(route, id) {
             this.product.photoNew = route
             this.product.id = id;
         },
@@ -541,16 +556,43 @@ let app = new Vue({
                     confirmButtonText: 'Aceptar'
                 });
             }
-          
+
             this.product.photo = '';
             this.product.photoExists = false;
         },
-        onHideModal(){
+        onHideModal() {
             this.product.photo = ''
         },
-        onFileChangeUpdate(event){
+        onFileChangeUpdate(event) {
             this.product.photo = event.target.files[0];
             this.product.photoExists = true;
-        }
+        },
+        increaseProduct() {
+            if (this.product.select.selected < this.product.select.stock) {
+                this.product.select.selected++;
+            }
+        },
+        decreaseProduct() {
+            if (this.product.select.selected > 1) {
+                this.product.select.selected--;
+            } else {
+                this.product.select.selected = 1;
+            }
+        },
+        handleOk () {
+            this.cart.push(this.product.select)
+            this.$nextTick(() => {
+              this.$bvModal.hide('modal-prevent-closing')
+            })
+            localStorage.setItem('cart', JSON.stringify(this.cart))
+            Swal.fire({
+                icon: 'success',
+                title: 'Se agrego al carrito',
+                text: "Se agrega correctamente el producto al carrito",
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar'
+            });
+          }
+
     },
 })
